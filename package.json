@@ -1,0 +1,23 @@
+{
+  "name": "queue-service",
+  "version": "1.0.0",
+  "description": "A simple store and forward queue with a RESTful service interface.",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "keywords": [
+    "queue",
+    "service",
+    "couchdb",
+    "store-forward"
+  ],
+  "author": "Dr. Ralf Berger",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-jasmine": "^2.4.0",
+    "gulp-typescript": "^2.13.6",
+    "run-sequence": "^1.2.2"
+  }
+}
