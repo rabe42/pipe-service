@@ -1,8 +1,15 @@
+/*
+ * A minimal gulpfile for Typescript node projects.
+ * Includes:
+ * transpile - For translation of Typescript files
+ * test - For running the tests.
+ */
 var gulp = require("gulp");
 var jasmine = require('gulp-jasmine');
 var ts = require("gulp-typescript");
-var tsProject = ts.createProject("tsconfig.json");
 var runSequence = require('run-sequence');
+
+var tsProject = ts.createProject("tsconfig.json");
 
 gulp.task("transpile", function () {
     return gulp.src(['src/*.ts', 'spec/*.spec.ts'])
