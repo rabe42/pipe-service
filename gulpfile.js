@@ -22,5 +22,8 @@ gulp.task("test", ["transpile"], function() {
         .pipe(jasmine());
 });
 
+gulp.task("build", ["transpile"], function() {
+});
+
 gulp.task("default", ["test"], function () {
 });
