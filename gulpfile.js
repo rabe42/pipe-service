@@ -5,7 +5,7 @@ var tsProject = ts.createProject("tsconfig.json");
 var runSequence = require('run-sequence');
 
 gulp.task("transpile", function () {
-    return tsProject.src()
+    return gulp.src(['src/*.ts', 'spec/*.spec.ts'])
         .pipe(ts(tsProject))
         .pipe(gulp.dest("dist"));
 });
@@ -17,4 +17,3 @@ gulp.task("test", ["transpile"], function() {
 
 gulp.task("default", ["test"], function () {
 });
-
