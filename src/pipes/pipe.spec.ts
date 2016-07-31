@@ -23,4 +23,7 @@ describe("The basic pipe", () => {
         aPipe.push(payload1);
         aPipe.push(payload2);
     });
+    it("should substitute the space in the pibe name by underscores", () => {
+        expect(aPipe.databaseName()).toBe("test_pipe");
+    });
 });

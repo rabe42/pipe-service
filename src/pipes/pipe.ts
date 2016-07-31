@@ -44,7 +44,7 @@ export class Pipe {
             this.couchDbUrl = couchDbUrl;
         }
         logger.info("Connect pipe '" + this.name + "' to " + this.destinations);
-        this.db = new(cradle.Connection)().database(name);
+        this.db = new(cradle.Connection)().database(this.databaseName());
     }
 
     /**
@@ -53,7 +53,7 @@ export class Pipe {
      *
      * @param payload The payload to be stored in the database.
      */
-    push(payload: any): void {
+    public push(payload: any): void {
         // Irgendwie benötige ich hier eine eindeutige Sequenznummer. Dies sollte am besten aus der DB kommen.
         // Dazu benöige ich jedoch eine Sequenzquelle! Aktuell gehe ich davon aus, dass die von der Datenbank 
         // vergebene Id genau diese Sequenz liefert. Dies ist jedoch nicht so, wenn die Datenbank für die Id eine
@@ -67,5 +67,9 @@ export class Pipe {
                 logger.info(this.name + ".push() successful.");
             }
         });
+    }
+
+    public databaseName(): string {
+        return this.name.replace(" ", "_").toLowerCase();
     }
 };
