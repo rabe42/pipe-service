@@ -1,10 +1,8 @@
 /// <reference path="../../typings/bunyan/bunyan.d.ts" />
 
-// import bunyan from "bunyan";            // Module bunyan has no default export. | Cannot find module 'bunyan'
-// import {bunyan} from "bunyan";          // module bunyan has no exported member 'bunyan' | Cannot find module 'bunyan'
-import * as bunyan from "bunyan";     // Cannot find module 'bunyan' | peroperty 'error' does not exist on type ...
-// import bunyan = require("bunyan");   // Cannot find module 'bunyan'
-// var bunyan = require("bunyan");      // Cannot find name require()
+// import bunyan from "bunyan";            // Module bunyan has no default export.
+// import {bunyan} from "bunyan";          // module bunyan has no exported member 'bunyan'.
+import * as bunyan from "bunyan";
 
 var logger = bunyan.createLogger({
     name: "PipeLogger", 
