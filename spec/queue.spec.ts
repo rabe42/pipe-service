@@ -1,7 +1,6 @@
 /// <reference path="../typings/jasmine/jasmine.d.ts"/>
 /// <reference path="../src/queueServer.ts" />
 
-//import Queues = require("../src/queueServer");
 import {Queues} from "../src/queueServer"
 
 describe("The queue interface", () => {

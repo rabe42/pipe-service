@@ -15,6 +15,7 @@
   "author": "Dr. Ralf Berger",
   "license": "ISC",
   "devDependencies": {
+    "del": "^2.2.1",
     "gulp": "^3.9.1",
     "gulp-jasmine": "^2.4.0",
     "gulp-typescript": "^2.13.6",
