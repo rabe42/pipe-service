@@ -19,7 +19,7 @@ gulp.task("clean:all", function() {
 });
 
 gulp.task("transpile", function() {
-    return gulp.src(['src/*.ts'])
+    return gulp.src(['src/**/*.ts'])
         .pipe(ts(tsProject))
         .pipe(gulp.dest("dist"));
 });
