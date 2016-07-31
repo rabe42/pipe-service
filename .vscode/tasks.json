@@ -12,12 +12,11 @@
             "taskName": "test",
             "args": [],
             "isTestCommand": true
-        }
+        },
         {
             "taskName": "build",
             "args": [],
             "isTestCommand": true
         }
-
     ]
 }

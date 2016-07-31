@@ -19,13 +19,13 @@ gulp.task("clean:all", function() {
 });
 
 gulp.task("transpile", function() {
-    return gulp.src(['src/*.ts', 'spec/*.spec.ts'])
+    return gulp.src(['src/*.ts'])
         .pipe(ts(tsProject))
         .pipe(gulp.dest("dist"));
 });
 
 gulp.task("test", ["transpile"], function() {
-    return gulp.src('dist/spec/*.spec.js')
+    return gulp.src('dist/**/*.spec.js')
         .pipe(jasmine());
 });
 

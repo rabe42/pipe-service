@@ -1,7 +1,7 @@
 /// <reference path="../typings/jasmine/jasmine.d.ts"/>
 /// <reference path="../src/queueServer.ts" />
 
-import {Queues} from "../src/queueServer"
+import {Queues} from "./queueServer"
 
 describe("The queue interface", () => {
 
