@@ -1,4 +1,11 @@
-import JL from "jsnlog";
+/// <reference path="../../typings/bunyan/bunyan.d.ts" />
+// import bunyan from "bunyan";            // Module bunyan has no default export. | Cannot find module 'bunyan'
+// import {bunyan} from "bunyan";          // module bunyan has no exported member 'bunyan' | Cannot find module 'bunyan'
+import * as bunyan from "bunyan";     // Cannot find module 'bunyan' | peroperty 'error' does not exist on type ...
+// import bunyan = require("bunyan");   // Cannot find module 'bunyan'
+// var bunyan = require("bunyan");      // Cannot find name require()
+
+var logger = bunyan.createLogger({name: "PipeLogger"});
 
 /**
  * Implements a simple push pipe, with the given name and destination.
@@ -7,7 +14,7 @@ import JL from "jsnlog";
  * @author Dr. Ralf Berger
  */
 export class Pipe {
-   name: string;
+    name: string;
     destinations: Array <string>;
     couchDbUrl: string = "http://localhost:5984/pipes";
     connected: boolean = false;
@@ -18,7 +25,7 @@ export class Pipe {
         if (couchDbUrl) {
             this.couchDbUrl = couchDbUrl;
         }
-        JL().error("Connect pipe '" + this.name + "' to " + this.destinations);
+        logger.error("Connect pipe '" + this.name + "' to " + this.destinations);
     }
 
     /**
