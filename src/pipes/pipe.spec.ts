@@ -13,8 +13,14 @@ describe("The basic pipe", () => {
     it("should use the default CouchDB", () => {
         expect(aPipe.couchDbUrl).toEqual("http://localhost:5984/pipes");
     });
-    it("should save the payload", () => {
+    it("should save a simple payload", () => {
         aPipe.push("A first payload.");
 //        expect(aPipe).
+    });
+    it("should save complex payloads", () => {
+        var payload1 = {name: "Skywalker", firstName: "Anakin"};
+        var payload2 = {name: "Skywalker", firstName: "Luke"};
+        aPipe.push(payload1);
+        aPipe.push(payload2);
     });
 });

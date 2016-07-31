@@ -24,6 +24,7 @@
     "run-sequence": "^1.2.2"
   },
   "dependencies": {
-    "bunyan": "^1.8.1"
+    "bunyan": "^1.8.1",
+    "cradle": "^0.7.1"
   }
 }
