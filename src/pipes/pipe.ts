@@ -1,11 +1,25 @@
 /// <reference path="../../typings/bunyan/bunyan.d.ts" />
+
 // import bunyan from "bunyan";            // Module bunyan has no default export. | Cannot find module 'bunyan'
 // import {bunyan} from "bunyan";          // module bunyan has no exported member 'bunyan' | Cannot find module 'bunyan'
 import * as bunyan from "bunyan";     // Cannot find module 'bunyan' | peroperty 'error' does not exist on type ...
 // import bunyan = require("bunyan");   // Cannot find module 'bunyan'
 // var bunyan = require("bunyan");      // Cannot find name require()
 
-var logger = bunyan.createLogger({name: "PipeLogger"});
+var logger = bunyan.createLogger({
+    name: "PipeLogger", 
+    level: 'info', 
+    streams: [
+        {
+            level: 'info',
+            path: './pipe.log.json'
+        },
+        {
+            level: 'error', 
+            stream: process.stderr
+        }
+    ]
+});
 
 /**
  * Implements a simple push pipe, with the given name and destination.
@@ -25,7 +39,7 @@ export class Pipe {
         if (couchDbUrl) {
             this.couchDbUrl = couchDbUrl;
         }
-        logger.error("Connect pipe '" + this.name + "' to " + this.destinations);
+        logger.info("Connect pipe '" + this.name + "' to " + this.destinations);
     }
 
     /**
