@@ -1,3 +1,5 @@
+import JL from "jsnlog";
+
 /**
  * Implements a simple push pipe, with the given name and destination.
  * It implements a simple store and forward logic.
@@ -16,7 +18,7 @@ export class Pipe {
         if (couchDbUrl) {
             this.couchDbUrl = couchDbUrl;
         }
-        //JL().error("Connect pipe to ");
+        JL().error("Connect pipe '" + this.name + "' to " + this.destinations);
     }
 
     /**

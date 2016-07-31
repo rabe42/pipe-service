@@ -21,5 +21,8 @@
     "gulp-typescript": "^2.13.6",
     "jasmine-core": "^2.4.1",
     "run-sequence": "^1.2.2"
+  },
+  "dependencies": {
+    "jsnlog": "^2.19.0"
   }
 }
