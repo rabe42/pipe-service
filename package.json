@@ -1,13 +1,15 @@
 {
   "name": "queue-service",
   "version": "1.0.0",
-  "description": "A simple store and forward queue with a RESTful service interface.",
-  "main": "index.js",
+  "description": "A simple store and forward queue/pipe system with a RESTful service interface.",
+  "main": "dist/main.js",
+  "repository": {},
   "scripts": {
     "test": "gulp test"
   },
   "keywords": [
     "queue",
+    "pipes",
     "service",
     "couchdb",
     "store-forward"
@@ -18,8 +20,10 @@
     "del": "^2.2.1",
     "gulp": "^3.9.1",
     "gulp-jasmine": "^2.4.0",
+    "gulp-sourcemaps": "^1.6.0",
     "gulp-typescript": "^2.13.6",
     "jasmine-core": "^2.4.1",
+    "path": "^0.12.7",
     "retyped-bunyan-tsd-ambient": "0.0.0-0",
     "run-sequence": "^1.2.2"
   },

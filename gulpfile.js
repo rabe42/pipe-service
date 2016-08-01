@@ -9,8 +9,10 @@
 var gulp = require("gulp");
 var jasmine = require('gulp-jasmine');
 var ts = require("gulp-typescript");
+var sourcemaps = require("gulp-sourcemaps");
 var runSequence = require('run-sequence');
 var del = require('del');
+var path = require('path');
 
 var tsProject = ts.createProject("tsconfig.json");
 
@@ -19,8 +21,18 @@ gulp.task("clean:all", function() {
 });
 
 gulp.task("transpile", function() {
-    return gulp.src(['src/**/*.ts'])
-        .pipe(ts(tsProject))
+    var tsResult = gulp.src(['src/**/*.ts'])
+        .pipe(sourcemaps.init())
+        .pipe(ts(tsProject));
+
+    return tsResult.js
+        .pipe(sourcemaps.write('.', {
+            includeContent: false,
+            sourceRoot: function (file) {
+                var sourceFile = path.join(file.cwd, file.sourceMap.file);
+                return path.relative(path.dirname(sourceFile), file.cwd);
+            } 
+        }))
         .pipe(gulp.dest("dist"));
 });
 
