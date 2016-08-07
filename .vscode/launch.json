@@ -60,7 +60,7 @@
             },
             "externalConsole": true,
             "sourceMaps": true,
-            "outDir": null
+            "outDir": "${workspaceRoot}/dist/"
         }
     ]
 }

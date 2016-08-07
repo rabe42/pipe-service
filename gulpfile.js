@@ -31,9 +31,7 @@ gulp.task("transpile", function() {
         .pipe(sourcemaps.write('.', {
             sourceRoot: function(file) {
                 let sourceFile = path.join(file.cwd, file.sourceMap.file);
-//                console.info('sourceRoot('+file.history[0]+')');
-                let result = path.relative(sourceFile, file.cwd) + "/src/";
-//                console.info('result: '+result);
+                let result = path.relative(sourceFile, file.cwd) + "/src";
                 return result;
             } 
         }))
