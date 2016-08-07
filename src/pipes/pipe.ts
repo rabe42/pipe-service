@@ -35,7 +35,7 @@ export class Pipe {
     destinations: Array <string>;
     couchDbUrl: string = "http://localhost:5984/pipes";
     connected: boolean = false;
-    db: cradle.Database;
+    dbConnection: cradle.Database;
 
     constructor(name: string, destinations: Array <string>, couchDbUrl?: string) {
         this.name = name;
@@ -43,8 +43,57 @@ export class Pipe {
         if (couchDbUrl) {
             this.couchDbUrl = couchDbUrl;
         }
-        logger.info("Connect pipe '" + this.name + "' to " + this.destinations);
-        this.db = new(cradle.Connection)().database(this.databaseName());
+        logger.info(this.name + "::Pipe.constructor(): Connect pipe '" + this.name + "' to " + this.destinations);
+        this.dbConnection = new(cradle.Connection)().database(this.databaseName());
+        logger.info(this.name + "::Pipe.constructor(): Connected to default CouchDB.");
+        this.createDatabase();
+    }
+
+    createDatabase(): void {
+        this.dbConnection.exists((err, exists) => {
+            if (err) {
+                logger.error(this.name + "::Pipe.createDatabase(): cannot even check the existence of the store due to: " + err);
+            }
+            else if (exists) {
+                logger.info(this.name + "::Pipe.createDatabase(): Use existing store.");
+            }
+            else {
+                this.dbConnection.create((err) => {
+                    if (err) {
+                        logger.error(this.name + "::Pipe.constructor(): wasn't able to create database due to: " + err);
+                    }
+                    else {
+                        logger.info(this.name + "::Pipe.constructor(): database created!");
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * Checks, if the database, attached to the queue is empty. 
+     * If it is empty or force is provided, it will delete the database from the server.
+     * If it isn't empty and no force is provided false will be returned.
+     */
+    public destroy(force?: boolean): boolean {
+        if (!this.databaseIsEmpty()) {
+            logger.info(this.name + ".destroy(): attempt to destroy non empty pipe.");
+            if (force) {
+                logger.info(this.name + "::Pipe.destroy(): destory pipe anyway!");
+                return true;
+            }
+            return false;
+        }
+        else {
+            logger.info(this.name + "::Pipe.destroy(): destroy empty pipe.");
+        }
+    }
+
+    /**
+     * Checks if the database is empty.
+     */
+    public databaseIsEmpty(): boolean {
+        return false;
     }
 
     /**
@@ -58,17 +107,20 @@ export class Pipe {
         // Dazu benöige ich jedoch eine Sequenzquelle! Aktuell gehe ich davon aus, dass die von der Datenbank 
         // vergebene Id genau diese Sequenz liefert. Dies ist jedoch nicht so, wenn die Datenbank für die Id eine
         // UUID verwendet.
-        var queueEntry = {time: new Date(), payload: payload};
-        this.db.save(payload, (err, res) => {
+        var pipeEntry = {time: new Date(), payload: payload};
+        this.dbConnection.save(pipeEntry, (err: any, res: any) => {
             if (err) {
-                logger.error(this.name + ".push() wasn't possible due to: " + err);
+                logger.error(this.name + "::Pipe.push() wasn't possible due to: " + err);
             }
             else {
-                logger.info(this.name + ".push() successful.");
+                logger.info(this.name + "::Pipe.push() successful.");
             }
         });
     }
 
+    /**
+     * Creates a CoucheDB conform database name from the pipes name.
+     */
     public databaseName(): string {
         return this.name.replace(" ", "_").toLowerCase();
     }
