@@ -1,4 +1,4 @@
-function hello(compiler: string): void {
+function my_hello(compiler: string): void {
     console.log(`Hello from ${compiler}`);
 }
-hello("my TypeScript");
+my_hello("my TypeScript");
