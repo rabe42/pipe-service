@@ -1,3 +1,5 @@
+"use strict";
+
 /*
  * A minimal gulpfile for Typescript node projects.
  * Includes:
@@ -27,10 +29,12 @@ gulp.task("transpile", function() {
 
     return tsResult.js
         .pipe(sourcemaps.write('.', {
-            includeContent: false,
-            sourceRoot: function (file) {
-                var sourceFile = path.join(file.cwd, file.sourceMap.file);
-                return path.relative(path.dirname(sourceFile), file.cwd);
+            sourceRoot: function(file) {
+                let sourceFile = path.join(file.cwd, file.sourceMap.file);
+//                console.info('sourceRoot('+file.history[0]+')');
+                let result = path.relative(sourceFile, file.cwd) + "/src/";
+//                console.info('result: '+result);
+                return result;
             } 
         }))
         .pipe(gulp.dest("dist"));

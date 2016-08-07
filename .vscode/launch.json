@@ -6,7 +6,7 @@
             "type": "node",
             "request": "launch",
             "program": "${workspaceRoot}/dist/main.js",
-            "stopOnEntry": true,
+            "stopOnEntry": false,
             "args": [],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": null,
@@ -18,8 +18,8 @@
                 "NODE_ENV": "development"
             },
             "externalConsole": false,
-            "sourceMaps": false,
-            "outDir": null
+            "sourceMaps": true,
+            "outDir": "${workspaceRoot}/dist/"
         },
         {
             "name": "Anfügen",
