@@ -18,9 +18,15 @@ var path = require('path');
 
 var tsProject = ts.createProject("tsconfig.json");
 
-gulp.task("clean:all", function() {
+gulp.task("clean:dist", function() {
     return del(['dist/**/*']);
 });
+
+gulp.task("clean:logs", function() {
+    return del(['**.log.json']);
+});
+
+gulp.task("clean:all", ['clean:dist', 'clean:logs']);
 
 gulp.task("transpile", function() {
     var tsResult = gulp.src(['src/**/*.ts'])
@@ -44,5 +50,5 @@ gulp.task("test", ["transpile"], function() {
 gulp.task("build", ["transpile"], function() {
 });
 
-gulp.task("default", ["test"], function () {
+gulp.task("default", ["test", "clean:logs"], function () {
 });
