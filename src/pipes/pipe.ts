@@ -26,8 +26,19 @@ var logger = bunyan.createLogger({
     ]
 });
 
-type PipeCallback = (err?: any, result?: any) => void;
+var defaultConnectionParameter: any = {
+    host: "http://localhost",
+    port: 5984,
+    cache: true,
+    raw: false,
+    secure: false,
+    retries: 0,
+    retryTimeout: 10e3,
+    forceSave: true,
+    headers: {}
+};
 
+type PipeCallback = (err?: any, result?: any) => void;
 
 /**
  * Implements a simple push pipe, with the given name and destination.
@@ -38,18 +49,30 @@ type PipeCallback = (err?: any, result?: any) => void;
 export class Pipe {
     name: string;
     destinations: Array <string>;
-    couchDbUrl: string = "http://localhost:5984/pipes";
     connected: boolean = false;
     dbConnection: cradle.Database;
 
-    constructor(name: string, destinations: Array <string>, couchDbUrl?: string) {
+    constructor(name: string, destinations: Array <string>, dbSpec?: any) {
         this.name = name;
         this.destinations = destinations;
-        if (couchDbUrl) {
-            this.couchDbUrl = couchDbUrl;
-        }
         logger.info(this.name + "::Pipe.constructor(): Connect pipe '" + this.name + "' to " + this.destinations);
-        this.connect();
+        this.connect(this.connectionParameter(dbSpec));
+    }
+
+    /**
+     * Merging the provided connection parameter with the default parameters.
+     */
+    public connectionParameter(dbSpec?: any): any {
+        let newDBSpec: any = {};
+        Object.keys(defaultConnectionParameter).forEach((element: string) => {
+            newDBSpec[element] = defaultConnectionParameter[element];
+        });
+        if (dbSpec) {
+            Object.keys(dbSpec).forEach((key: string) => {
+                newDBSpec[key] = dbSpec[key];
+            })
+        }
+        return newDBSpec;
     }
 
     /**
@@ -114,7 +137,7 @@ export class Pipe {
      * @param payload The payload to be stored in the database.
      * @param cb Called, when the operation finished.
      */
-    public push(payload: any, error: any, success: any): void {
+    public push(payload: any, error?: any, success?: any): void {
         // Irgendwie benötige ich hier eine eindeutige Sequenznummer. Dies sollte am besten aus der DB kommen.
         // Dazu benöige ich jedoch eine Sequenzquelle! 
         // CouchDB verwendet eine UUID als Id, die als Sequenznummer ungeeignet ist. Dies konnte ich durch 
@@ -142,6 +165,11 @@ export class Pipe {
                 if (success) success(res);
             }
         });
+    }
+
+    public pop(pipeCallback: PipeCallback): void {
+        var id = "TODO";
+        this.dbConnection.get(id, pipeCallback);
     }
 
     /**

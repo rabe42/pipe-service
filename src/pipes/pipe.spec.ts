@@ -8,14 +8,16 @@ describe("The basic pipe", () => {
         aPipe = new Pipe("Test Pipe", ["http://x.y.z"]);
         expect(aPipe).toBeDefined();
     });
+    it("should deliver merged connection properties", () => {
+        let connectionProperties = aPipe.connectionParameter({host: "a.b.c"});
+        expect(connectionProperties.host).toBe("a.b.c");
+        expect(connectionProperties.port).toBe(5984);
+    })
     it("should have a name", () => {
         expect(aPipe.name).toEqual("Test Pipe");
     });
     it("should have a destination", () => {
         expect(aPipe.destinations).toEqual(["http://x.y.z"]);
-    });
-    it("should use the default CouchDB", () => {
-        expect(aPipe.couchDbUrl).toEqual("http://localhost:5984/pipes");
     });
     it("should save a simple payload", (done) => {
         aPipe.push("A first payload.", (err: any) => { 
@@ -46,5 +48,10 @@ describe("The basic pipe", () => {
             }
             done();
         });
-    })
+    });
+    /*
+    it("should retrieve the first payload", () => {
+        fail("Not implemented yet!");
+    });
+    */
 });
