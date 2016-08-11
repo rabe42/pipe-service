@@ -42,7 +42,7 @@ gulp.task("transpile", function() {
         .pipe(gulp.dest("dist"));
 });
 
-gulp.task("test", ["transpile"], function() {
+gulp.task("test", ["clean:logs", "transpile"], function() {
     return gulp.src('dist/**/*.spec.js')
         .pipe(jasmine());
 });
@@ -50,5 +50,5 @@ gulp.task("test", ["transpile"], function() {
 gulp.task("build", ["transpile"], function() {
 });
 
-gulp.task("default", ["test", "clean:logs"], function () {
+gulp.task("default", ["test"], function () {
 });

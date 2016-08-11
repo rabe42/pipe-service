@@ -1,10 +1,12 @@
 /// <reference path="../../typings/bunyan/bunyan.d.ts" />
 /// <reference path="../../typings/cradle/cradle.d.ts" />
+/// <reference path="../../typings/async/async.d.ts" />
 
 // import bunyan from "bunyan";            // Module bunyan has no default export.
 // import {bunyan} from "bunyan";          // module bunyan has no exported member 'bunyan'.
 import * as bunyan from "bunyan";
 import * as cradle from "cradle";
+import * as async from "async";
 
 /**
  * The logger, used by the pipes.
@@ -23,6 +25,9 @@ var logger = bunyan.createLogger({
         }
     ]
 });
+
+type PipeCallback = (err?: any, result?: any) => void;
+
 
 /**
  * Implements a simple push pipe, with the given name and destination.
@@ -44,26 +49,37 @@ export class Pipe {
             this.couchDbUrl = couchDbUrl;
         }
         logger.info(this.name + "::Pipe.constructor(): Connect pipe '" + this.name + "' to " + this.destinations);
-        this.dbConnection = new(cradle.Connection)().database(this.databaseName());
-        logger.info(this.name + "::Pipe.constructor(): Connected to default CouchDB.");
-        this.createDatabase();
+        this.connect();
     }
 
-    createDatabase(): void {
+    /**
+     * Connect to the specified database.
+     */
+    private connect(dbSpec?: any) {
+        this.dbConnection = new(cradle.Connection)().database(this.databaseName());
+        this.connected = true;
+        logger.info(this.name + "::Pipe.connect(): Connected to default CouchDB.");
+    }
+
+    private createDatabase(callback: PipeCallback): void {
         this.dbConnection.exists((err, exists) => {
             if (err) {
                 logger.error(this.name + "::Pipe.createDatabase(): cannot even check the existence of the store due to: " + err);
+                callback(err);
             }
             else if (exists) {
                 logger.info(this.name + "::Pipe.createDatabase(): Use existing store.");
+                callback(null, exists);
             }
             else {
                 this.dbConnection.create((err) => {
                     if (err) {
                         logger.error(this.name + "::Pipe.constructor(): wasn't able to create database due to: " + err);
+                        callback(err);
                     }
                     else {
                         logger.info(this.name + "::Pipe.constructor(): database created!");
+                        callback(null, false);
                     }
                 });
             }
@@ -75,18 +91,13 @@ export class Pipe {
      * If it is empty or force is provided, it will delete the database from the server.
      * If it isn't empty and no force is provided false will be returned.
      */
-    public destroy(force?: boolean): boolean {
-        if (!this.databaseIsEmpty()) {
-            logger.info(this.name + ".destroy(): attempt to destroy non empty pipe.");
-            if (force) {
-                logger.info(this.name + "::Pipe.destroy(): destory pipe anyway!");
-                return true;
+    public destroy(callback: any, force?: boolean): void {
+        this.dbConnection.destroy((err) => {
+            if (err) {
+                logger.error(this.name + "::Pipe.destroy(): attempt to destroy pipe fails due to: " + err);
             }
-            return false;
-        }
-        else {
-            logger.info(this.name + "::Pipe.destroy(): destroy empty pipe.");
-        }
+            callback(err);
+        });
     }
 
     /**
@@ -101,19 +112,34 @@ export class Pipe {
      * the payload from the database and deliver it to the destination.
      *
      * @param payload The payload to be stored in the database.
+     * @param cb Called, when the operation finished.
      */
-    public push(payload: any): void {
+    public push(payload: any, error: any, success: any): void {
         // Irgendwie benötige ich hier eine eindeutige Sequenznummer. Dies sollte am besten aus der DB kommen.
-        // Dazu benöige ich jedoch eine Sequenzquelle! Aktuell gehe ich davon aus, dass die von der Datenbank 
-        // vergebene Id genau diese Sequenz liefert. Dies ist jedoch nicht so, wenn die Datenbank für die Id eine
-        // UUID verwendet.
+        // Dazu benöige ich jedoch eine Sequenzquelle! 
+        // CouchDB verwendet eine UUID als Id, die als Sequenznummer ungeeignet ist. Dies konnte ich durch 
+        // die Verwendung der Zeit validieren.
         var pipeEntry = {time: new Date(), payload: payload};
-        this.dbConnection.save(pipeEntry, (err: any, res: any) => {
+        // TODO: Aus noch unbekannten Gründen geht der Callback hier verloren.
+        async.series([
+            (callback) => {
+                // Create database, if not existent.
+                this.createDatabase(callback);
+            },
+            (callback) => {
+                // Save the data.
+                this.dbConnection.save(pipeEntry, (err: any, res: any) => {
+                    callback(err, res);
+                });
+            }
+        ], (err, res) => {
             if (err) {
                 logger.error(this.name + "::Pipe.push() wasn't possible due to: " + err);
+                if (error) error(err);
             }
             else {
                 logger.info(this.name + "::Pipe.push() successful.");
+                if (success) success(res);
             }
         });
     }

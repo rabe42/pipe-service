@@ -2,8 +2,12 @@ import {Pipe} from "./pipe";
 
 describe("The basic pipe", () => {
 
-    const aPipe: Pipe = new Pipe("Test Pipe", ["http://x.y.z"]);
+    var aPipe: Pipe = undefined;
 
+    it("should create a pipe", () => {
+        aPipe = new Pipe("Test Pipe", ["http://x.y.z"]);
+        expect(aPipe).toBeDefined();
+    });
     it("should have a name", () => {
         expect(aPipe.name).toEqual("Test Pipe");
     });
@@ -13,17 +17,34 @@ describe("The basic pipe", () => {
     it("should use the default CouchDB", () => {
         expect(aPipe.couchDbUrl).toEqual("http://localhost:5984/pipes");
     });
-    it("should save a simple payload", () => {
-        aPipe.push("A first payload.");
-//        expect(aPipe).
+    it("should save a simple payload", (done) => {
+        aPipe.push("A first payload.", (err: any) => { 
+                fail("With error: " + err);
+                done(); 
+            }, (res: any) => { 
+                done(); 
+            });
     });
-    it("should save complex payloads", () => {
+    it("should save complex payloads", (done) => {
         var payload1 = {name: "Skywalker", firstName: "Anakin"};
         var payload2 = {name: "Skywalker", firstName: "Luke"};
-        aPipe.push(payload1);
-        aPipe.push(payload2);
+        aPipe.push(payload1, null, null);
+        aPipe.push(payload2, (err: any) => { 
+                fail("With error: " + err);
+                done(); 
+            }, (res: any) => { 
+                done(); 
+            });
     });
     it("should substitute the space in the pibe name by underscores", () => {
         expect(aPipe.databaseName()).toBe("test_pipe");
     });
+    it("should destroy the pipe", (done) => {
+        aPipe.destroy((err: any) => {
+            if (err) {
+                fail("With error: " + err);
+            }
+            done();
+        });
+    })
 });
