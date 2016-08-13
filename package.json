@@ -19,9 +19,11 @@
   "devDependencies": {
     "del": "^2.2.1",
     "gulp": "^3.9.1",
+    "gulp-istanbul": "^1.0.0",
     "gulp-jasmine": "^2.4.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-typescript": "^2.13.6",
+    "istanbul": "^0.4.4",
     "jasmine-core": "^2.4.1",
     "path": "^0.12.7",
     "remap-istanbul": "^0.6.4",

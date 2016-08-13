@@ -14,6 +14,7 @@ var coverage = require('gulp-coverage');
 var ts = require("gulp-typescript");
 var sourcemaps = require("gulp-sourcemaps");
 var runSequence = require('run-sequence');
+var istanbul = require('gulp-istanbul');
 var remapIstanbul = require('remap-istanbul/lib/gulpRemapIstanbul');
 var del = require('del');
 var path = require('path');
@@ -51,12 +52,31 @@ gulp.task("test", ["clean:logs", "transpile"], function() {
     return gulp.src(tests)
         .pipe(jasmine());
 });
-/*
-gulp.task("coverage", ["clean:logs", "tanspile"], function() {
+
+gulp.task('pre-test', ['clean:logs', 'transpile'], function () {
+    // TODO: Hier gibt es noch einiges zu tun!
+    return gulp.src(['dist/**/*.js'])
+        // Covering files
+        .pipe(istanbul())
+        // Force `require` to return covered files
+        .pipe(istanbul.hookRequire());
+});
+
+gulp.task('test-coverage', ['pre-test'], function () {
     return gulp.src(tests)
-        .pipe.();
-})
-*/
+        .pipe(jasmine())
+        // Creating the reports after tests ran
+        .pipe(istanbul.writeReports())
+        // Enforce a coverage of at least 90%
+        .pipe(istanbul.enforceThresholds({ thresholds: { global: 90 } }));
+});
+
+gulp.task('remap-istanbul', function () {
+    return gulp.src('coverage-final.json')
+        .pipe(remapIstanbul())
+        .pipe(gulp.dest('coverage-remapped.json'));
+});
+
 gulp.task("build", ["transpile"], function() {
 });
 
