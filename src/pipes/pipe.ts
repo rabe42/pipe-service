@@ -76,6 +76,14 @@ export class Pipe {
     }
 
     /**
+     * Changes the document id generation of the CouchDB database.
+     * curl -X PUT http://localhost:5984/_config/uuids/algorithm -d '"utc_random"'
+     */
+    private dbSetup() {
+        
+    }
+
+    /**
      * Connect to the specified database.
      */
     private connect(dbSpec?: any) {
