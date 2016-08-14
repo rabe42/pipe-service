@@ -122,7 +122,7 @@ export class Pipe {
      * If it is empty or force is provided, it will delete the database from the server.
      * If it isn't empty and no force is provided false will be returned.
      */
-    public destroy(callback: any, force?: boolean): void {
+    public destroy(callback: PipeCallback, force?: boolean): void {
         this.dbConnection.destroy((err) => {
             if (err) {
                 logger.error(this.name + "::Pipe.destroy(): attempt to destroy pipe fails due to: " + err);
@@ -145,7 +145,7 @@ export class Pipe {
      * @param payload The payload to be stored in the database.
      * @param cb Called, when the operation finished.
      */
-    public push(payload: any, error?: any, success?: any): void {
+    public push(payload: any, pipeCallback?: PipeCallback): void {
         var pipeEntry = {time: new Date(), payload: payload};
         async.series([
             (callback) => {
@@ -161,12 +161,11 @@ export class Pipe {
         ], (err, res) => {
             if (err) {
                 logger.error(this.name + "::Pipe.push() wasn't possible due to: " + err);
-                if (error) error(err);
             }
             else {
                 logger.info(this.name + "::Pipe.push() successful.");
-                if (success) success(res);
             }
+            if (pipeCallback) pipeCallback(err, res);
         });
     }
 

@@ -20,23 +20,23 @@ describe("The basic pipe", () => {
         expect(aPipe.destinations).toEqual(["http://x.y.z"]);
     });
     it("should save a simple payload", (done) => {
-        aPipe.push("A first payload.", (err: any) => { 
+        aPipe.push("A first payload.", (err: any, res: any) => { 
+            if (err) {
                 fail("With error: " + err);
-                done(); 
-            }, (res: any) => { 
-                done(); 
-            });
+            }
+            done(); 
+        });
     });
     it("should save complex payloads", (done) => {
         var payload1 = {name: "Skywalker", firstName: "Anakin"};
         var payload2 = {name: "Skywalker", firstName: "Luke"};
-        aPipe.push(payload1, null, null);
-        aPipe.push(payload2, (err: any) => { 
+        aPipe.push(payload1);
+        aPipe.push(payload2, (err: any, res: any) => { 
+            if (err) {
                 fail("With error: " + err);
-                done(); 
-            }, (res: any) => { 
-                done(); 
-            });
+            }   
+            done(); 
+        });
     });
     it("should substitute the space in the pibe name by underscores", () => {
         expect(aPipe.databaseName()).toBe("test_pipe");
