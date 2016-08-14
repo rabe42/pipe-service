@@ -43,6 +43,8 @@ type PipeCallback = (err?: any, result?: any) => void;
 /**
  * Implements a simple push pipe, with the given name and destination.
  * It implements a simple store and forward logic.
+ * The implementation requires, that the setup of the uuid algorithm is changed with this command:
+ * curl -X PUT http://localhost:5984/_config/uuids/algorithm -d '"sequential"'
  *
  * @author Dr. Ralf Berger
  */
@@ -73,14 +75,6 @@ export class Pipe {
             })
         }
         return newDBSpec;
-    }
-
-    /**
-     * Changes the document id generation of the CouchDB database.
-     * curl -X PUT http://localhost:5984/_config/uuids/algorithm -d '"utc_random"'
-     */
-    private dbSetup() {
-        
     }
 
     /**
@@ -122,19 +116,42 @@ export class Pipe {
      * If it is empty or force is provided, it will delete the database from the server.
      * If it isn't empty and no force is provided false will be returned.
      */
-    public destroy(callback: PipeCallback, force?: boolean): void {
-        this.dbConnection.destroy((err) => {
+    public destroy(pipeCallback: PipeCallback, force?: boolean): void {
+        async.series([
+            (callback) => {
+                this.databaseIsEmpty(callback, force);
+            },
+            (callback) => {
+                this.dbConnection.destroy(callback);
+            }
+        ], (err: any, result: any) => {
             if (err) {
                 logger.error(this.name + "::Pipe.destroy(): attempt to destroy pipe fails due to: " + err);
             }
-            callback(err);
+            pipeCallback(err);
         });
     }
 
     /**
      * Checks if the database is empty.
      */
-    public databaseIsEmpty(): boolean {
+    private databaseIsEmpty(callback: PipeCallback, force?: boolean): boolean {
+        var dbInfo = this.dbConnection.info((err: any, result: any) => {
+            logger.info("Database info: " + result);
+            if (err) {
+                callback(err);
+                return;
+            }
+            else if (result) {
+                var error: Error;
+                if (result.doc_count > 0 && !force) {
+                    error = new Error("Cannot destroy pipe database as it is not empty");
+                    callback(error);
+                    return;
+                }
+            }
+            callback(null, true);
+        });
         return false;
     }
 

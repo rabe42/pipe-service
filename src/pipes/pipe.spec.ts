@@ -55,10 +55,26 @@ describe("The basic pipe", () => {
     it("should substitute the space in the pibe name by underscores", () => {
         expect(aPipe.databaseName()).toBe("test_pipe");
     });
-    it("should destroy the pipe", (done) => {
+    it("should not be possible to destroy a non empty pipe database", (done) => {
+        aPipe.destroy((err: any) => {
+            if (!err) {
+                fail("Shouldn't be possible to destroy.")
+            }
+            done();
+        });
+    });
+    it("should force to destroy the pipe", (done) => {
         aPipe.destroy((err: any) => {
             if (err) {
                 fail("With error: " + err);
+            }
+            done();
+        }, true);
+    });
+    it("should not be possible to destroy the failed pipe.", (done) => {
+        aPipe.destroy((err: any) => {
+            if (!err) {
+                fail("It is possible to destroy a non existing database.");
             }
             done();
         });
