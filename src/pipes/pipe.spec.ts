@@ -3,10 +3,16 @@ import {Pipe} from "./pipe";
 describe("The basic pipe", () => {
 
     var aPipe: Pipe = undefined;
+    var aFailedPipe: Pipe = undefined;
 
     it("should create a pipe", () => {
         aPipe = new Pipe("Test Pipe", ["http://x.y.z"]);
         expect(aPipe).toBeDefined();
+    });
+    it("should not fail to create the pipe on a port without database", () => {
+        // Due to lazy logic, this shouldn't fail.
+        aFailedPipe = new Pipe("A Failed Pipe", ["http://a.b.c"], {port: 12345});
+        expect(aFailedPipe.dbSpec.port).toBe(12345);
     });
     it("should deliver merged connection properties", () => {
         let connectionProperties = aPipe.connectionParameter({host: "a.b.c"});
@@ -26,6 +32,14 @@ describe("The basic pipe", () => {
             }
             done(); 
         });
+    });
+    it("should not save a simple payload to a the failed pipe", (done) => {
+        aFailedPipe.push("A simple payload.", (err: any, res: any) => {
+            if (!err) {
+                fail("Saving without database possible.")
+            }
+            done();
+        })
     });
     it("should save complex payloads", (done) => {
         var payload1 = {name: "Skywalker", firstName: "Anakin"};

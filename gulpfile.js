@@ -67,7 +67,7 @@ gulp.task('test-istanbul', ['pre-istanbul'], function () {
     return gulp.src(tests)
         .pipe(jasmine())
         .pipe(istanbul.writeReports())
-        .pipe(istanbul.enforceThresholds({ thresholds: { global: 50 } }));
+        .pipe(istanbul.enforceThresholds({ thresholds: { global: 80 } }));
 });
 
 gulp.task('remap-istanbul', ['test-istanbul'], function () {

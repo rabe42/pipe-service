@@ -49,7 +49,7 @@ type PipeCallback = (err?: any, result?: any) => void;
 export class Pipe {
     name: string;
     destinations: Array <string>;
-    connected: boolean = false;
+    dbSpec: any;
     dbConnection: cradle.Database;
 
     constructor(name: string, destinations: Array <string>, dbSpec?: any) {
@@ -86,10 +86,10 @@ export class Pipe {
     /**
      * Connect to the specified database.
      */
-    private connect(dbSpec?: any) {
-        this.dbConnection = new(cradle.Connection)().database(this.databaseName());
-        this.connected = true;
-        logger.info(this.name + "::Pipe.connect(): Connected to default CouchDB.");
+    private connect(dbSpec: any) {
+        this.dbConnection = new(cradle.Connection)(dbSpec).database(this.databaseName());
+        logger.info(this.name + "::Pipe.connect(): Connected to " + dbSpec.host + ":" + dbSpec.port);
+        this.dbSpec = dbSpec;
     }
 
     private createDatabase(callback: PipeCallback): void {
