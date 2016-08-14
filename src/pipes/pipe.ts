@@ -146,12 +146,7 @@ export class Pipe {
      * @param cb Called, when the operation finished.
      */
     public push(payload: any, error?: any, success?: any): void {
-        // Irgendwie benötige ich hier eine eindeutige Sequenznummer. Dies sollte am besten aus der DB kommen.
-        // Dazu benöige ich jedoch eine Sequenzquelle! 
-        // CouchDB verwendet eine UUID als Id, die als Sequenznummer ungeeignet ist. Dies konnte ich durch 
-        // die Verwendung der Zeit validieren.
         var pipeEntry = {time: new Date(), payload: payload};
-        // TODO: Aus noch unbekannten Gründen geht der Callback hier verloren.
         async.series([
             (callback) => {
                 // Create database, if not existent.
