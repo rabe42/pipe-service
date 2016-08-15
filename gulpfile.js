@@ -17,7 +17,6 @@ var runSequence = require('run-sequence');
 var istanbul = require('gulp-istanbul');
 var remapIstanbul = require('remap-istanbul/lib/gulpRemapIstanbul');
 var del = require('del');
-var path = require('path');
 
 var tsProject = ts.createProject("tsconfig.json");
 
@@ -57,20 +56,20 @@ gulp.task("test", ["clean:logs", "transpile"], function() {
         .pipe(jasmine());
 });
 
-gulp.task('pre-istanbul', ['clean:logs', 'clean:coverage', 'transpile'], function () {
+gulp.task('pre:istanbul', ['clean:logs', 'clean:coverage', 'transpile'], function () {
     return gulp.src(['!dist/**/*.spec.js', 'dist/**/*.js'])
         .pipe(istanbul())
         .pipe(istanbul.hookRequire());
 });
 
-gulp.task('test-istanbul', ['pre-istanbul'], function () {
+gulp.task('test:istanbul', ['pre:istanbul'], function () {
     return gulp.src(tests)
         .pipe(jasmine())
         .pipe(istanbul.writeReports())
         .pipe(istanbul.enforceThresholds({ thresholds: { global: 80 } }));
 });
 
-gulp.task('remap-istanbul', ['test-istanbul'], function () {
+gulp.task('test:remap-istanbul', ['test:istanbul'], function () {
     return gulp.src('coverage/coverage-final.json')
         .pipe(remapIstanbul({
             reports: {

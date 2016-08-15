@@ -186,6 +186,26 @@ export class Pipe {
         });
     }
 
+    /**
+     * This still needs some attention!
+     */
+    /*
+    public init(pipeCallback: PipeCallback) {
+        async.series([
+            (callback) => {
+                this.createDatabase(callback);
+            },
+            (callback) => {
+                this.dbConnection.save('_desgin/pipe', {
+                    
+                })
+            }
+        ], (err, res) => {
+
+        });
+    }
+    */
+
     public pop(pipeCallback: PipeCallback): void {
         var id = "TODO";
         this.dbConnection.get(id, pipeCallback);

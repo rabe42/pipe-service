@@ -25,7 +25,6 @@
     "gulp-typescript": "^2.13.6",
     "istanbul": "^0.4.4",
     "jasmine-core": "^2.4.1",
-    "path": "^0.12.7",
     "remap-istanbul": "^0.6.4",
     "retyped-bunyan-tsd-ambient": "0.0.0-0",
     "run-sequence": "^1.2.2"

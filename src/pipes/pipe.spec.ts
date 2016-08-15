@@ -1,6 +1,6 @@
 import {Pipe} from "./pipe";
 
-describe("The basic pipe", () => {
+describe("The pipe interface:", () => {
 
     var aPipe: Pipe = undefined;
     var aFailedPipe: Pipe = undefined;
