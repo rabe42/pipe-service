@@ -29,7 +29,9 @@ var defaultConnectionParameter: any = {
 };
 
 type PipeCallback = (err?: any, result?: any) => void;
-var defaultCallback: PipeCallback = () => {};
+var defaultCallback: PipeCallback = () => {
+    logger.warn("Default callback called!");
+};
 
 /**
  * Implements a simple push pipe, with the given name and destination.
