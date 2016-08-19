@@ -2,19 +2,34 @@
 
 import * as bunyan from "bunyan";
 
+var commonStream = {
+    level: 'info',
+    path: 'common.log.json'
+};
+
+var serverStream = {
+    level: 'info',
+    path: 'server.log.json'
+};
+
+var pipeStream = {
+    level: 'info',
+    path: './pipe.log.json'
+};
+
+var errorStream = {
+    level: 'error',
+    path: 'error.log.json'
+}
+
 export var pipeLoggerConfig: bunyan.LoggerOptions = {
     name: "PipeLogger",
     level: 'info', 
-    streams: [
-        {
-            level: 'info',
-            path: './pipe.log.json'
-        },
-        {
-            level: 'error', 
-            /*stream: process.stderr*/
-            path: './pipe.err.log.json'
-        }
-    ]
+    streams: [commonStream, pipeStream, errorStream]
 };
 
+export var pipeHttpServerLoggerConfig: bunyan.LoggerOptions = {
+    name: "PipeHttpServerLogger",
+    level: 'info',
+    streams: [commonStream, serverStream, errorStream]
+}
