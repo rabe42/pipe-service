@@ -4,6 +4,7 @@ describe("The pipe interface:", () => {
 
     var aPipe: Pipe;
     var aFailedPipe: Pipe;
+    var aNewPipe: Pipe;
     var payload1 = {name: "Skywalker", firstName: "Anakin"};
     var payload2 = {name: "Skywalker", firstName: "Luke"};
 
@@ -161,13 +162,25 @@ describe("The pipe interface:", () => {
             done();
         });
     });
+    it("should be possible to create another pipe", (done) => {
+        // I've to make sure, that the initialization is done once, before I destroy the database again.
+        aNewPipe = new Pipe("localTest", ["a.b.c"]);
+        aNewPipe.init(done);
+    });
     it ("should be possible to call all functions also without callback", (done) => {
-        var localPipe = new Pipe("localTest", ["a.b.c"]);
-        localPipe.init();
-        localPipe.push("Hello");
-        localPipe.peek();
-        localPipe.remove({_id: "1", _rev: "1"});
-        localPipe.destroy();
-        localPipe.destroy(done);
+        aNewPipe.init();
+        aNewPipe.push("Hello");
+        aNewPipe.peek();
+        aNewPipe.remove({_id: "1", _rev: "1"});
+        aNewPipe.destroy();
+        setTimeout(done, 500);
+    });
+    it ("should be possible to destroy the pipe, even if not all other processes are finished", (done) => {
+        aNewPipe.destroy((err, res) => {
+            if (err) {
+                fail("Cannot destroy the database.");
+            }
+            done();
+        }, true);
     });
 });
