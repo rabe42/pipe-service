@@ -21,7 +21,8 @@ var logger = bunyan.createLogger({
         },
         {
             level: 'error', 
-            stream: process.stderr
+            /*stream: process.stderr*/
+            path: './pipe.err.log.json'
         }
     ]
 });
@@ -162,7 +163,7 @@ export class Pipe {
      * @param payload The payload to be stored in the database.
      * @param cb Called, when the operation finished.
      */
-    public push(payload: any, pipeCallback?: PipeCallback): void {
+    public push(payload: any, pipeCallback: PipeCallback): void {
         var pipeEntry = {time: new Date(), payload: payload};
         async.series([
             (callback) => {
@@ -189,7 +190,7 @@ export class Pipe {
     /**
      * This still needs some attention!
      */
-    public init(pipeCallback?: PipeCallback) {
+    public init(pipeCallback: PipeCallback) {
         async.series([
             (callback) => {
                 this.createDatabase(callback);
@@ -242,7 +243,7 @@ export class Pipe {
        
         this.dbConnection.remove(message._id, message._rev, (err, res) => {
             if (err) {
-                logger.error(this.name + "::Pipe.pop(): failed due to: " + err);
+                logger.error(this.name + "::Pipe.remove(): failed due to: " + err);
             }
             if (pipeCallback) pipeCallback(err, res);
         });
