@@ -161,4 +161,13 @@ describe("The pipe interface:", () => {
             done();
         });
     });
+    it ("should be possible to call all functions also without callback", (done) => {
+        var localPipe = new Pipe("localTest", ["a.b.c"]);
+        localPipe.init();
+        localPipe.push("Hello");
+        localPipe.peek();
+        localPipe.remove({_id: "1", _rev: "1"});
+        localPipe.destroy();
+        localPipe.destroy(done);
+    });
 });
