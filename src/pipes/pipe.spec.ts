@@ -132,7 +132,7 @@ describe("The pipe interface:", () => {
     it("should retrieve and delete the next message", (done) => {
         aPipe.peek((err: any, message: any) => {
             if (err) {
-                fail("couldn't peek data from pipe due to: " + err);
+                fail("Couldn't peek data from pipe due to: " + err);
             }
             expect(message).toBeDefined();
             expect(message.payload).toBeDefined();
@@ -146,13 +146,30 @@ describe("The pipe interface:", () => {
             });
         });
     });
-    it("should force to destroy the pipe", (done) => {
+    it("should retrieve and delete the last message", (done) => {
+        aPipe.peek((err: any, message: any) => {
+            if (err) {
+                fail("Couldn't peek data from pipe due to: " + err);
+            }
+            expect(message).toBeDefined();
+            expect(message.payload).toBeDefined();
+            expect(message.payload.firstName).toBe(payload2.firstName);
+            expect(message.payload.name).toBe(payload2.name);
+            aPipe.remove(message, (err: any, result: any) => {
+                if (err) {
+                    fail("Couldn't delete message due to: " + err)
+                }
+                done();
+            });
+        });
+    });
+    it("should be possible to destroy the now empty pipe", (done) => {
         aPipe.destroy((err: any) => {
             if (err) {
                 fail("With error: " + err);
             }
             done();
-        }, true);
+        });
     });
     it("should not be possible to destroy the failed pipe.", (done) => {
         aPipe.destroy((err: any) => {
@@ -164,7 +181,7 @@ describe("The pipe interface:", () => {
     });
     it("should be possible to create another pipe", (done) => {
         // I've to make sure, that the initialization is done once, before I destroy the database again.
-        aNewPipe = new Pipe("localTest", ["a.b.c"]);
+        aNewPipe = new Pipe("aNewPipe", ["a.b.c"]);
         aNewPipe.init(done);
     });
     it ("should be possible to call all functions also without callback", (done) => {
@@ -175,11 +192,9 @@ describe("The pipe interface:", () => {
         aNewPipe.destroy();
         setTimeout(done, 500);
     });
-    it ("should be possible to destroy the pipe, even if not all other processes are finished", (done) => {
+    it ("should be possible to force to destroy the pipe", (done) => {
         aNewPipe.destroy((err, res) => {
-            if (err) {
-                fail("Cannot destroy the database.");
-            }
+            // Ignore the error in this case, as the destroy of the previous call might have worked, as the database was empty.
             done();
         }, true);
     });

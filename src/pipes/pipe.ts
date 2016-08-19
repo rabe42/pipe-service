@@ -115,14 +115,15 @@ export class Pipe {
      * Checks if the database is empty. If not, a error is Provided.
      */
     private checkIsEmpty(callback: PipeCallback, force?: boolean): void {
-        var dbInfo = this.dbConnection.info((err: any, result: any) => {
-            logger.info("Database info: " + result);
+        var dbInfo = this.dbConnection.info((err: any, dbInfo: any) => {
+            logger.info("Database info: " + dbInfo);
             if (err) {
                 logger.error(this.name + "::Pipe.databaseIsEmpty(): failed due to: " + err);
                 callback(err);
                 return;
             }
-            if (result.doc_count > 0 && !force) {
+            if (dbInfo.doc_count > 1 && !force) {
+                // doc_count contains also the _design (view) document of the database.
                 callback(new Error("Cannot destroy pipe database as it is not empty"));
                 return;
             }
