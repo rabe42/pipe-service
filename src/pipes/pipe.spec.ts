@@ -53,7 +53,14 @@ describe("The pipe interface:", () => {
         })
     });
     it("should save complex payloads", (done) => {
-        aPipe.push(payload1);
+        aPipe.push(payload1, (err: any, res: any) => { 
+            if (err) {
+                fail("With error: " + err);
+            }   
+            done(); 
+        });
+    });
+    it("should save the third payload", (done) => {
         aPipe.push(payload2, (err: any, res: any) => { 
             if (err) {
                 fail("With error: " + err);
@@ -80,6 +87,14 @@ describe("The pipe interface:", () => {
             else {
                 expect(result).toBeDefined();
                 expect(result.payload).toBe("A first payload.");
+            }
+            done();
+        });
+    });
+    it("should not retrieve data from failed pipe", (done) => {
+        aFailedPipe.peek((err: any, result: any) => {
+            if (!err) {
+                fail("It shouldn't be possible to retrieve data from non existing pipe.");
             }
             done();
         });
