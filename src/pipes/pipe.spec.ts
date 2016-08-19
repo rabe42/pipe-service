@@ -2,8 +2,11 @@ import {Pipe} from "./pipe";
 
 describe("The pipe interface:", () => {
 
-    var aPipe: Pipe = undefined;
-    var aFailedPipe: Pipe = undefined;
+    var aPipe: Pipe;
+    var aFailedPipe: Pipe;
+    var payload1 = {name: "Skywalker", firstName: "Anakin"};
+    var payload2 = {name: "Skywalker", firstName: "Luke"};
+
 
     it("should create a pipe", () => {
         aPipe = new Pipe("Test Pipe", ["http://x.y.z"]);
@@ -25,6 +28,14 @@ describe("The pipe interface:", () => {
     it("should have a destination", () => {
         expect(aPipe.destinations).toEqual(["http://x.y.z"]);
     });
+    it("should be possible to initalize", (done) => {
+        aPipe.init((err, res) => {
+            if (err) {
+                fail("With error: " + err);
+            }
+            done();
+        });
+    });
     it("should save a simple payload", (done) => {
         aPipe.push("A first payload.", (err: any, res: any) => { 
             if (err) {
@@ -42,8 +53,6 @@ describe("The pipe interface:", () => {
         })
     });
     it("should save complex payloads", (done) => {
-        var payload1 = {name: "Skywalker", firstName: "Anakin"};
-        var payload2 = {name: "Skywalker", firstName: "Luke"};
         aPipe.push(payload1);
         aPipe.push(payload2, (err: any, res: any) => { 
             if (err) {
@@ -63,6 +72,51 @@ describe("The pipe interface:", () => {
             done();
         });
     });
+    it("should retrieve the first message", (done) => {
+        aPipe.peek((err: any, result: any) => {
+            if (err) {
+                fail("Should be possible to read the first payload!");
+            }
+            else {
+                expect(result).toBeDefined();
+                expect(result.payload).toBe("A first payload.");
+            }
+            done();
+        });
+    });
+    it("should retrieve and delete the first message.", (done) => {
+        aPipe.peek((err: any, message: any) => {
+            if (err) {
+                fail("couldn't peek data from pipe due to: " + err);
+            }
+            expect(message).toBeDefined();
+            expect(message.payload).toBeDefined();
+            expect(message.payload).toBe("A first payload.");
+            aPipe.remove(message, (err: any, result: any) => {
+                if (err) {
+                    fail("Couldn't delete message due to: " + err)
+                }
+                done();
+            });
+        });
+    });
+    it("should retrieve and delete the next message", (done) => {
+        aPipe.peek((err: any, message: any) => {
+            if (err) {
+                fail("couldn't peek data from pipe due to: " + err);
+            }
+            expect(message).toBeDefined();
+            expect(message.payload).toBeDefined();
+            expect(message.payload.firstName).toBe(payload1.firstName);
+            expect(message.payload.name).toBe(payload1.name);
+            aPipe.remove(message, (err: any, result: any) => {
+                if (err) {
+                    fail("Couldn't delete message due to: " + err)
+                }
+            });
+            done();
+        });
+    });
     it("should force to destroy the pipe", (done) => {
         aPipe.destroy((err: any) => {
             if (err) {
@@ -79,9 +133,4 @@ describe("The pipe interface:", () => {
             done();
         });
     });
-    /*
-    it("should retrieve the first payload", () => {
-        fail("Not implemented yet!");
-    });
-    */
 });

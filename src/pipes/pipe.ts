@@ -90,21 +90,21 @@ export class Pipe {
         this.dbConnection.exists((err, exists) => {
             if (err) {
                 logger.error(this.name + "::Pipe.createDatabase(): cannot even check the existence of the store due to: " + err);
-                callback(err);
+                if (callback) callback(err);
             }
             else if (exists) {
                 logger.info(this.name + "::Pipe.createDatabase(): Use existing store.");
-                callback(null, exists);
+                if (callback) callback(null, exists);
             }
             else {
                 this.dbConnection.create((err) => {
                     if (err) {
                         logger.error(this.name + "::Pipe.constructor(): wasn't able to create database due to: " + err);
-                        callback(err);
+                        if (callback) callback(err);
                     }
                     else {
                         logger.info(this.name + "::Pipe.constructor(): database created!");
-                        callback(null, false);
+                        if (callback) callback(null, false);
                     }
                 });
             }
@@ -128,7 +128,7 @@ export class Pipe {
             if (err) {
                 logger.error(this.name + "::Pipe.destroy(): attempt to destroy pipe fails due to: " + err);
             }
-            pipeCallback(err);
+            if (pipeCallback) pipeCallback(err);
         });
     }
 
@@ -139,18 +139,18 @@ export class Pipe {
         var dbInfo = this.dbConnection.info((err: any, result: any) => {
             logger.info("Database info: " + result);
             if (err) {
-                callback(err);
+                if (callback) callback(err);
                 return;
             }
             else if (result) {
                 var error: Error;
                 if (result.doc_count > 0 && !force) {
                     error = new Error("Cannot destroy pipe database as it is not empty");
-                    callback(error);
+                    if (callback) callback(error);
                     return;
                 }
             }
-            callback(null, true);
+            if (callback) callback(null, true);
         });
         return false;
     }
@@ -189,26 +189,63 @@ export class Pipe {
     /**
      * This still needs some attention!
      */
-    /*
-    public init(pipeCallback: PipeCallback) {
+    public init(pipeCallback?: PipeCallback) {
         async.series([
             (callback) => {
                 this.createDatabase(callback);
             },
             (callback) => {
-                this.dbConnection.save('_desgin/pipe', {
-                    
-                })
+                // Save a view for the database. (I expect, that at this point the database is part of the html request.)
+                this.dbConnection.save('_design/pipe', {
+                    all: {map: 'function (doc) {emit(doc._id, doc);}'}
+                }, callback);
             }
         ], (err, res) => {
-
+            if (err) {
+                logger.error(this.name + '::Pipe.init(): Wasn\'t able to init the pipe due to: ' + err);
+            }
+            if (pipeCallback) pipeCallback(err, res);
         });
     }
-    */
 
-    public pop(pipeCallback: PipeCallback): void {
-        var id = "TODO";
-        this.dbConnection.get(id, pipeCallback);
+    /**
+     * Retrieve the oldest element from the database, associated with the pipe.
+     * It deliveres the object with the complete set of Metadata, to allow the
+     * receiver to check on the origin of the payload. It also provides the unique
+     * message id, which is needed for the removal of the message from the queue.
+     * 
+     * @param pipeCallback The omnipresent JS callback.
+     */
+    public peek(pipeCallback: PipeCallback): void {
+        this.dbConnection.view("pipe/all", {limit: 1}, (err, res) => {
+            if (err) {
+                logger.error(this.name + '::Pipe.peek(): failed due to ' + err);
+            }
+            if (res instanceof Array && res.length == 1) {
+                let result = res[0].value;
+                if (pipeCallback) pipeCallback(err, result);
+            }
+            else {
+                if (pipeCallback) pipeCallback("Unexpected result!", null);
+            }
+        });
+    }
+
+    /**
+     * Delete the document with the given Id from the database. This is the
+     * only way to delete anything, as it must be shure, that we delete something,
+     * which was really delivered to the other end of the pipe.
+     * @param id The database id of the object.
+     * @param pipeCallback The omnipresent JS callback.
+     */
+    public remove(message: any, pipeCallback: PipeCallback): void {
+       
+        this.dbConnection.remove(message._id, message._rev, (err, res) => {
+            if (err) {
+                logger.error(this.name + "::Pipe.pop(): failed due to: " + err);
+            }
+            if (pipeCallback) pipeCallback(err, res);
+        });
     }
 
     /**
