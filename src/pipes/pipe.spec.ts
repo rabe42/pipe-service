@@ -36,6 +36,14 @@ describe("The pipe interface:", () => {
             done();
         });
     });
+    it("should not be possible to initialize failed pipe", (done) => {
+        aFailedPipe.init((err, res) => {
+            if (!err) {
+                fail("Initalization of non existing pipe is possible.");
+            }
+            done();
+        });
+    });
     it("should save a simple payload", (done) => {
         aPipe.push("A first payload.", (err: any, res: any) => { 
             if (err) {
