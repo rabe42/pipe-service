@@ -1,6 +1,7 @@
 /// <reference path="../../typings/bunyan/bunyan.d.ts" />
 /// <reference path="../../typings/cradle/cradle.d.ts" />
 /// <reference path="../../typings/async/async.d.ts" />
+/// <reference path="../loggerConfig.ts" />
 
 // import bunyan from "bunyan";            // Module bunyan has no default export.
 // import {bunyan} from "bunyan";          // module bunyan has no exported member 'bunyan'.
@@ -8,24 +9,12 @@ import * as bunyan from "bunyan";
 import * as cradle from "cradle";
 import * as async from "async";
 
+import {pipeLoggerConfig} from "../loggerConfig";
+
 /**
  * The logger, used by the pipes.
  */
-var logger = bunyan.createLogger({
-    name: "PipeLogger", 
-    level: 'info', 
-    streams: [
-        {
-            level: 'info',
-            path: './pipe.log.json'
-        },
-        {
-            level: 'error', 
-            /*stream: process.stderr*/
-            path: './pipe.err.log.json'
-        }
-    ]
-});
+var logger = bunyan.createLogger(pipeLoggerConfig);
 
 var defaultConnectionParameter: any = {
     host: "http://localhost",
