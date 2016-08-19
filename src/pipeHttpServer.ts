@@ -30,4 +30,8 @@ export class PipeHttpServer {
         });
         logger.info("PipeHttpServer.start(): Starting service...");
     }
+
+    public close() {
+        this.server.close();
+    }
 }

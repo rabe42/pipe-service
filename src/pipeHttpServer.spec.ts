@@ -21,4 +21,7 @@ describe("The pipe http server", () => {
             fail("Wasn't able to start the server as I catched: " + error);
         }
     });
+    it("should terminate the server", () => {
+        httpServer.close();
+    });
 });
