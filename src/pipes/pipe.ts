@@ -121,26 +121,22 @@ export class Pipe {
     }
 
     /**
-     * Checks if the database is empty.
+     * Checks if the database is empty. If not, a error is Provided.
      */
-    private databaseIsEmpty(callback: PipeCallback, force?: boolean): boolean {
+    private checkIsEmpty(callback: PipeCallback, force?: boolean): void {
         var dbInfo = this.dbConnection.info((err: any, result: any) => {
             logger.info("Database info: " + result);
             if (err) {
+                logger.error(this.name + "::Pipe.databaseIsEmpty(): failed due to: " + err);
                 callback(err);
                 return;
             }
-            if (result) {
-                var error: Error;
-                if (result.doc_count > 0 && !force) {
-                    error = new Error("Cannot destroy pipe database as it is not empty");
-                    callback(error);
-                    return;
-                }
+            if (result.doc_count > 0 && !force) {
+                callback(new Error("Cannot destroy pipe database as it is not empty"));
+                return;
             }
             callback(null, true);
         });
-        return false;
     }
 
     /**
@@ -244,7 +240,7 @@ export class Pipe {
     public destroy(pipeCallback: PipeCallback = defaultCallback, force?: boolean): void {
         async.series([
             (callback) => {
-                this.databaseIsEmpty(callback, force);
+                this.checkIsEmpty(callback, force);
             },
             (callback) => {
                 this.dbConnection.destroy(callback);
