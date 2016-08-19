@@ -111,7 +111,12 @@ describe("The pipe interface:", () => {
                 if (err) {
                     fail("Couldn't delete message due to: " + err)
                 }
-                done();
+                aPipe.remove(message, (err: any) => {
+                    if (!err) {
+                        fail("Could delete message twice!");
+                    }
+                    done();
+                });
             });
         });
     });
@@ -128,8 +133,8 @@ describe("The pipe interface:", () => {
                 if (err) {
                     fail("Couldn't delete message due to: " + err)
                 }
+                done();
             });
-            done();
         });
     });
     it("should force to destroy the pipe", (done) => {
