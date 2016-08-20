@@ -4,7 +4,7 @@
 import * as async from "async";
 import * as cradle from "cradle";
 
-describe("The async lib", ()=> {
+describe("The async lib", () => {
     var dbConnection: cradle.Database;
 
     it("should call the final callback with empty lists immediately.", () => {

@@ -1,9 +1,9 @@
-/// <reference path="../typings/bunyan/bunyan.d.ts" />
+/// <reference path="../../typings/bunyan/bunyan.d.ts" />
 
 import * as bunyan from "bunyan";
 import * as http from "http"; 
 
-import {pipeHttpServerLoggerConfig} from "./loggerConfig";
+import {pipeHttpServerLoggerConfig} from "../loggerConfig";
 
 var logger = bunyan.createLogger(pipeHttpServerLoggerConfig);
 
