@@ -1,3 +1,5 @@
+/// <reference path="../../typings/jasmine/jasmine.d.ts"/>
+
 import * as http from "http";
 import * as querystring from "querystring";
 

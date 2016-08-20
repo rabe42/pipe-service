@@ -1,3 +1,5 @@
+/// <reference path="../../typings/jasmine/jasmine.d.ts"/>
+
 import {Pipe} from "./pipe";
 
 describe("The pipe interface:", () => {
