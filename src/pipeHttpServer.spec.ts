@@ -30,19 +30,16 @@ describe("The pipe http server", () => {
         let clientRequest = http.request({hostname: "localhost", port: 8081, method: "PUT", path: "/hello"},
             (result: http.IncomingMessage) => {
                 result.setEncoding('utf8');
+                result.on('data', (chunk: any) => {
+                    // Ignoring the answer... But this must be handled to get to the end.
+                });
                 result.on('end', () => { 
                     expect(result.statusCode).toBe(200);
                     done();
                  });
             });
-        clientRequest.on("error", (err: any) => {
+        clientRequest.on('error', (err: any) => {
             fail("Request failed due to: " + err);
-        });
-        clientRequest.on("end", (err: any, result: http.IncomingMessage) => {
-            expect(result).toBeDefined();
-            expect(result.statusCode).toBeDefined();
-            expect(result.statusCode).toBe(200);
-            done();
         });
         clientRequest.write(message);
         clientRequest.end();
