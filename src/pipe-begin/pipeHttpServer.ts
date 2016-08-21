@@ -4,6 +4,7 @@ import * as bunyan from "bunyan";
 import * as http from "http"; 
 
 import {pipeHttpServerLoggerConfig} from "../loggerConfig";
+import {ListenerConfig, PipeConfig, pipes} from "../pipeConfig";
 
 var logger = bunyan.createLogger(pipeHttpServerLoggerConfig);
 
@@ -17,11 +18,13 @@ export class PipeHttpServer {
     server: any;
     port: number = 8081;
     hostname: string = "localhost";
+    listenerConfigs: ListenerConfig[] = [];
 
     constructor() {
         if (pipeHttpServerSingleton) {
             throw Error("It's not allowed to create a second instance.")
         }
+        this.readConfig();
     }
 
     /**
@@ -47,6 +50,7 @@ export class PipeHttpServer {
     }
 
     public start(callback: (err: any) => void) {
+        this.readConfig();
         server.listen(this.port, this.hostname, (err: any) => {
             if (err) {
                 logger.error("PipeHttpServer.start(): Couldn't start server due to: " + err);
@@ -59,14 +63,21 @@ export class PipeHttpServer {
     public close() {
         server.close();
     }
+
+    /**
+     * Reads all begin configuration type 'http'.
+     */
+    private readConfig(): void {
+        pipes.forEach((element: PipeConfig) => {
+            if (element.beginType === 'http') {
+                this.listenerConfigs.push(<ListenerConfig>element.beginConfig);
+            }
+        });
+    }
 };
 
 export const pipeHttpServerSingleton: PipeHttpServer = new PipeHttpServer();
 
 const server = http.createServer((request: http.IncomingMessage, response: http.ServerResponse) => {
-    if (!pipeHttpServerSingleton) {
-        logger.error("PipeHttpServer::createServer: No pipe server created!");
-        throw Error("PipeHttpServer singleton must be initialized first!");
-    }
     pipeHttpServerSingleton.serve(request, response);
 });
