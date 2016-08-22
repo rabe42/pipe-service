@@ -18,7 +18,7 @@ export class PipeHttpServer {
     server: any;
     port: number = 8081;
     hostname: string = "localhost";
-    listenerConfigs: ListenerConfig[] = [];
+    pipeConfigs: PipeConfig[] = [];
 
     constructor() {
         if (pipeHttpServerSingleton) {
@@ -70,7 +70,7 @@ export class PipeHttpServer {
     private readConfig(): void {
         pipes.forEach((element: PipeConfig) => {
             if (element.beginType === 'http') {
-                this.listenerConfigs.push(<ListenerConfig>element.beginConfig);
+                this.pipeConfigs.push(element);
             }
         });
     }

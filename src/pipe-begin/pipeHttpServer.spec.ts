@@ -15,7 +15,7 @@ describe("The pipe http server", () => {
         catch (e) {};
     });
     it("should read the configuration.", () => {
-        expect(pipeHttpServerSingleton.listenerConfigs.length).toBe(2);
+        expect(pipeHttpServerSingleton.pipeConfigs.length).toBe(2);
     });
     it("should start the server", (done) => {
         try {
