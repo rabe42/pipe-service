@@ -11,8 +11,9 @@ var logger = bunyan.createLogger(pipeHttpServerLoggerConfig);
 /**
  * This is the http server, which accepts messages for certain pipes.
  * 
- * TODO Read pipe configuration
+ * TODO Store message
  * TODO Create server response
+ * TODO Provide status information (queue-names, queue sizes)
  */
 export class PipeHttpServer {
     server: any;
@@ -36,19 +37,38 @@ export class PipeHttpServer {
         if (req.method === "PUT") {
             this.put(req, res);
         }
+        else if (req.method === "GET") {
+            this.get(req, res);
+        }
         else {
+            logger.warn("Unsupported request method: " + req.method);
             res.statusCode = 404;
             res.setHeader("Content-Type", "text/plain");
-            res.end("Hello from the pipe world")
+            res.end("Hello from the pipe world!")
         }
     }
 
+    private get(request: http.IncomingMessage, response: http.ServerResponse) {
+        logger.info("PipeHttpServer.get(): Asked for statistics on: " + request.url);
+        response.statusCode = 200;
+        response.end();
+    }
+
+    /**
+     * Handle the http-put request.
+     * @param request The http request object.
+     * @param response The http response object, where the result has to be communicated.
+     */
     private put(request: http.IncomingMessage, response: http.ServerResponse): void {
         logger.info("PipeHttpServer.put(): Service called.")
         response.statusCode = 200;
         response.end("end");
     }
 
+    /**
+     * Start all the configured pipe begin services.
+     * @param callback Will be called, if the services are started.
+     */
     public start(callback: (err: any) => void) {
         this.readConfig();
         server.listen(this.port, this.hostname, (err: any) => {

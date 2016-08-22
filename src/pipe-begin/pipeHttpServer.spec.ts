@@ -49,6 +49,20 @@ describe("The pipe http server", () => {
         clientRequest.write(message);
         clientRequest.end();
     });
+    it("should deliver the pipes configured at this node.", (done) => {
+        let clientRequest = http.request({hostname: "localhost", port: 8081, method: "GET", path: "/"},
+            (result: http.IncomingMessage) => {
+                result.setEncoding('utf8');
+                result.on('data', (chunk: any) => {
+                    // TODO: Check if the right content was delivered.
+                });
+                result.on('end', () => {
+                    expect(result.statusCode).toBe(200);
+                    done();
+                });
+            });
+        clientRequest.end();
+    });
     it("should terminate the server", () => {
         pipeHttpServerSingleton.close();
     });
