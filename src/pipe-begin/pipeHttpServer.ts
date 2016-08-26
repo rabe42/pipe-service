@@ -1,10 +1,13 @@
 /// <reference path="../../typings/bunyan/bunyan.d.ts" />
+/// <reference path="../../typings/async/async.d.ts"/>
 
 import * as bunyan from "bunyan";
 import * as http from "http"; 
+import * as async from "async";
 
 import {pipeHttpServerLoggerConfig} from "../loggerConfig";
 import {ListenerConfig, PipeConfig, pipes} from "../pipeConfig";
+import {Pipe, PipeCallback} from "../pipes/pipe";
 
 var logger = bunyan.createLogger(pipeHttpServerLoggerConfig);
 
@@ -17,9 +20,8 @@ var logger = bunyan.createLogger(pipeHttpServerLoggerConfig);
  */
 export class PipeHttpServer {
     server: any;
-    port: number = 8081;
-    hostname: string = "localhost";
     pipeConfigs: PipeConfig[] = [];
+    pipeInstances: Pipe[] = [];
 
     constructor() {
         if (pipeHttpServerSingleton) {
@@ -70,14 +72,24 @@ export class PipeHttpServer {
      * @param callback Will be called, if the services are started.
      */
     public start(callback: (err: any) => void) {
+        logger.info("PipeHttpServer.start(): Starting service...");
         this.readConfig();
-        server.listen(this.port, this.hostname, (err: any) => {
+        async.series([
+            (cb) => {
+                this.createPipes(cb);
+            },
+            (cb) => {
+                logger.debug("PipeHttpServer.start(): start listening...");
+                // TODO: Create a server for every individual configured server port.
+                // Unfortunately, this requires a different approach!
+                server.listen(8081, "localhost", cb);
+            }
+        ], (err: any) => {
             if (err) {
                 logger.error("PipeHttpServer.start(): Couldn't start server due to: " + err);
             }
             callback(err);
         });
-        logger.info("PipeHttpServer.start(): Starting service...");
     }
 
     public close() {
@@ -88,11 +100,44 @@ export class PipeHttpServer {
      * Reads all begin configuration type 'http'.
      */
     private readConfig(): void {
+        logger.debug("PipeHttpServer.readConfig()");
+        this.pipeConfigs = [];
         pipes.forEach((element: PipeConfig) => {
             if (element.beginType === 'http') {
+                logger.debug("PipeHttpServer.readConfig(): " + element.name + " " + element.description 
+                            + "(" + (<ListenerConfig>element.beginConfig).hostname
+                            + ":" + (<ListenerConfig>element.beginConfig).port + ")");
                 this.pipeConfigs.push(element);
             }
         });
+        logger.debug("PipeHttpServer.readConfig(): finished.")
+    }
+
+    /**
+     * Creates the configured pipes.
+     */
+    private createPipes(callback: PipeCallback): void {
+        logger.debug("PipeHttpServer.createPipes()");
+        this.pipeInstances = [];
+        let initCalls: any[] = [];
+        this.pipeConfigs.forEach((config: PipeConfig) => {
+            let newPipe: Pipe = new Pipe(config.name);
+            this.pipeInstances.push(newPipe);
+            logger.debug("PipeHttpServer.createPipes(): Pipe with name: " + config.name + " created.");
+            initCalls.push((cb: any) => {
+                // TODO: The problem here is, how to handover the newPipe to this callback?
+                logger.debug("PipeHttpServer.createPipes(): initializing pipe named: " + newPipe.name);
+                newPipe.init(cb);
+            });
+        });
+        async.parallel(initCalls, (err: any) => {
+            logger.debug("PipeHttpServer.createPipes(): All pipes initialized or err: " + err);
+            if (err) {
+                logger.error("PipeHttpServer.createPipes(): initialization error: " + err);
+            }
+            callback(err);
+        });
+        logger.debug("PipeHttpServer.createPipes(): end.");
     }
 };
 

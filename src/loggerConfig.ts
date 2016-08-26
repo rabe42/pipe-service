@@ -8,7 +8,7 @@ var commonStream = {
 };
 
 var serverStream = {
-    level: 'info',
+    level: 'debug',
     path: 'server.log.json'
 };
 

@@ -28,7 +28,7 @@ var defaultConnectionParameter: any = {
     headers: {}
 };
 
-type PipeCallback = (err?: any, result?: any) => void;
+export type PipeCallback = (err?: any, result?: any) => void;
 var defaultCallback: PipeCallback = () => {
     logger.warn("Default callback called!");
 };
@@ -43,14 +43,12 @@ var defaultCallback: PipeCallback = () => {
  */
 export class Pipe {
     name: string;
-    destinations: Array <string>;
     dbSpec: any;
     private dbConnection: cradle.Database;
 
-    constructor(name: string, destinations: Array <string>, dbSpec?: any) {
+    constructor(name: string, dbSpec?: any) {
         this.name = name;
-        this.destinations = destinations;
-        logger.info(this.name + "::Pipe.constructor(): Connect pipe '" + this.name + "' to " + this.destinations);
+        logger.info(this.name + "::Pipe.constructor(): Connect pipe '" + this.name);
         this.connect(this.connectionParameter(dbSpec));
     }
 

@@ -14,9 +14,6 @@ describe("The pipe http server", () => {
         }
         catch (e) {};
     });
-    it("should read the configuration.", () => {
-        expect(pipeHttpServerSingleton.pipeConfigs.length).toBe(2);
-    });
     it("should start the server", (done) => {
         try {
             pipeHttpServerSingleton.start((err) => {
@@ -29,6 +26,12 @@ describe("The pipe http server", () => {
         catch (error) {
             fail("Wasn't able to start the server as I catched: " + error);
         }
+    });
+    it("should read the configuration.", () => {
+        expect(pipeHttpServerSingleton.pipeConfigs.length).toBe(2);
+    });
+    it("should create the pipes.", () => {
+        expect(pipeHttpServerSingleton.pipeInstances.length).toBe(2);
     });
     it("should accept requests", (done) => {
         let message = querystring.stringify({msg: "Hello Pipe", attribute: "attribute1", paramenter: "parameter1"});
@@ -49,6 +52,7 @@ describe("The pipe http server", () => {
         clientRequest.write(message);
         clientRequest.end();
     });
+    /*
     it("should deliver the pipes configured at this node.", (done) => {
         let clientRequest = http.request({hostname: "localhost", port: 8081, method: "GET", path: "/"},
             (result: http.IncomingMessage) => {
@@ -63,6 +67,7 @@ describe("The pipe http server", () => {
             });
         clientRequest.end();
     });
+    */
     it("should terminate the server", () => {
         pipeHttpServerSingleton.close();
     });

@@ -17,7 +17,7 @@ describe("The pipe interface:", () => {
     });
     it("should not fail to create the pipe on a port without database", () => {
         // Due to lazy logic, this shouldn't fail.
-        aFailedPipe = new Pipe("A Failed Pipe", ["http://a.b.c"], {port: 12345});
+        aFailedPipe = new Pipe("A Failed Pipe", {port: 12345});
         expect(aFailedPipe.dbSpec.port).toBe(12345);
     });
     it("should deliver merged connection properties", () => {
@@ -27,9 +27,6 @@ describe("The pipe interface:", () => {
     })
     it("should have a name", () => {
         expect(aPipe.name).toEqual("Test Pipe");
-    });
-    it("should have a destination", () => {
-        expect(aPipe.destinations).toEqual(["http://x.y.z"]);
     });
     it("should be possible to initalize", (done) => {
         aPipe.init((err, res) => {
