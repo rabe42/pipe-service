@@ -66,7 +66,7 @@ describe("http service", () => {
                 (<any>this).parent.post(request, response);
             }
             else if (request.method === "DELETE") {
-                (<any>this).parent.delete(request, response);
+                (<any>this).parent.remove(request, response);
             }
         }
         get(request: http.IncomingMessage, response: http.ServerResponse) {
@@ -81,7 +81,8 @@ describe("http service", () => {
             response.statusCode = 200;
             response.end("POST processed! (" + this.port + ")");
         }
-        delete(request: http.IncomingMessage, response: http.ServerResponse) {
+        // Don't name your methods "delete"!
+        remove(request: http.IncomingMessage, response: http.ServerResponse) {
             response.statusCode = 200;
             response.end("DELETE processed! (" + this.port + ")");
         }
@@ -114,8 +115,14 @@ describe("http service", () => {
         request("GET", 8084, "GET processed! (8084)", 200, done);
     });
     it("should be possible to use also the other instance.", (done) => {
-        request("PUT", 8083, "PUT processed! (8083)", 200, done);
-    })
+        request("DELETE", 8083, "DELETE processed! (8083)", 200, done);
+    });
+    it("should process also another request.", (done) => {
+        request("POST", 8084, "POST processed! (8084)", 200, done);
+    });
+    it("should process also the PUT request.", (done) => {
+        request("PUT", 8084, "PUT processed! (8084)", 200, done);
+    });
     it("should be possible to close my servers.", () => {
         myserver1.close();
         myserver2.close();
