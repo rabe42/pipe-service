@@ -19,28 +19,56 @@ var logger = bunyan.createLogger(pipeHttpServerLoggerConfig);
  * TODO Provide status information (queue-names, queue sizes)
  */
 export class PipeHttpServer {
-    server: any;
+    port: number;
+    hostname: string;
+    pipeName: string;
+    server: http.Server;
+    pipe: Pipe;
     pipeConfigs: PipeConfig[] = [];
     pipeInstances: Pipe[] = [];
 
-    constructor() {
-        if (pipeHttpServerSingleton) {
-            throw Error("It's not allowed to create a second instance.")
-        }
-        this.readConfig();
+    constructor(port: number, hostname: string, pipeName: string, callback: (err: any) => void) {
+        this.port = port;
+        this.hostname = hostname;
+        this.pipeName = pipeName;
+        this.server = http.createServer(this.serve);
+        (<any>this.server).parent = this;
+        this.start(callback);
+    }
+
+    /**
+     * Creates the pipe and start listening. Call the callback, if both was finished or a error occured.
+     */
+    private start(callback: (err: any) => void): void {
+        async.series([
+            (cb) => {
+                // Creates the pipe
+                this.pipe = new Pipe(this.pipeName);
+                this.pipe.init(cb);
+            },
+            (cb) => {
+                // Start listening
+                this.server.listen(this.port, this.hostname, cb);
+            },
+        ], (err: any) => {
+            if (err) {
+                logger.error("PipeHttpServer.start(): cannot start due to: " + err);
+            }
+            callback(err);
+        });
     }
 
     /**
      * This is the central entry point for the management of the http request.
      * It distributes the requests to the different other methods "put", "get", "delete", "post".
      */
-    public serve(req: http.IncomingMessage, res: http.ServerResponse): void {
+    private serve(req: http.IncomingMessage, res: http.ServerResponse): void {
         logger.info("PipeHttpServer.serve(): Service called.");
         if (req.method === "PUT") {
-            this.put(req, res);
+            (<any>this).parent.put(req, res);
         }
         else if (req.method === "GET") {
-            this.get(req, res);
+            (<any>this).parent.get(req, res);
         }
         else {
             logger.warn("Unsupported request method: " + req.method);
@@ -71,7 +99,7 @@ export class PipeHttpServer {
      * Start all the configured pipe begin services.
      * @param callback Will be called, if the services are started.
      */
-    public start(callback: (err: any) => void) {
+    private oldstart(callback: (err: any) => void) {
         logger.info("PipeHttpServer.start(): Starting service...");
         this.readConfig();
         async.series([
@@ -82,7 +110,7 @@ export class PipeHttpServer {
                 logger.debug("PipeHttpServer.start(): start listening...");
                 // TODO: Create a server for every individual configured server port.
                 // Unfortunately, this requires a different approach!
-                server.listen(8081, "localhost", cb);
+                this.server.listen(8081, "localhost", cb);
             }
         ], (err: any) => {
             if (err) {
@@ -93,7 +121,7 @@ export class PipeHttpServer {
     }
 
     public close() {
-        server.close();
+        this.server.close();
     }
 
     /**
@@ -140,9 +168,3 @@ export class PipeHttpServer {
         logger.debug("PipeHttpServer.createPipes(): end.");
     }
 };
-
-export const pipeHttpServerSingleton: PipeHttpServer = new PipeHttpServer();
-
-const server = http.createServer((request: http.IncomingMessage, response: http.ServerResponse) => {
-    pipeHttpServerSingleton.serve(request, response);
-});
