@@ -91,8 +91,18 @@ export class PipeHttpServer {
      */
     private put(request: http.IncomingMessage, response: http.ServerResponse): void {
         logger.info("PipeHttpServer.put(): Service called.")
-        response.statusCode = 200;
-        response.end("end");
+        if (request.url !== this.pipe.name) {
+            response.statusCode = 404;
+            response.end("Pipe not managed by this service.");
+        }
+        else {
+            response.statusCode = 200;
+            // TODO Store the data in the pipe here!
+            // Check, if the pipe is managed by this service.
+            // Store the data asynchronously and providing the response back, when finished.
+
+            response.end("end");
+        }
     }
 
     public close() {

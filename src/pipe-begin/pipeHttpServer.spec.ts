@@ -17,16 +17,18 @@ describe("The pipe http server", () => {
             done();
         });
     });
-    it("should accept requests", (done) => {
+    it("should accept requests and fail, if not correctly placed.", (done) => {
+        let serverResponse: string = "";
         let message = querystring.stringify({msg: "Hello Pipe", attribute: "attribute1", paramenter: "parameter1"});
         let clientRequest = http.request({hostname: "localhost", port: 8081, method: "PUT", path: "/hello"},
             (result: http.IncomingMessage) => {
                 result.setEncoding('utf8');
-                result.on('data', (chunk: any) => {
-                    // Ignoring the answer... But this must be handled to get to the end.
+                result.on('data', (chunk: string) => {
+                    serverResponse += chunk;
                 });
                 result.on('end', () => { 
-                    expect(result.statusCode).toBe(200);
+                    expect(result.statusCode).toBe(404);
+                    expect(serverResponse).toBe("Pipe not managed by this service.");
                     done();
                  });
             });
