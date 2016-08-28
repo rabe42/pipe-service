@@ -98,10 +98,15 @@ export class PipeHttpServer {
         else {
             response.statusCode = 200;
             // TODO Store the data in the pipe here!
-            // Check, if the pipe is managed by this service.
             // Store the data asynchronously and providing the response back, when finished.
-
-            response.end("Ok");
+            let document = "";
+            request.on("data", (chunk: string) => {
+                logger.debug("PipeHttpServer.put(): read '%s'", document);
+            });
+            request.on("end", () => {
+                this.pipe.push(document);
+                response.end("Ok");
+            });
         }
     }
 
