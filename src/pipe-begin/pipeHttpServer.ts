@@ -14,9 +14,7 @@ var logger = bunyan.createLogger(pipeHttpServerLoggerConfig);
 /**
  * This is the http server, which accepts messages for certain pipes.
  * 
- * TODO Store message
- * TODO Create server response
- * TODO Provide status information (queue-names, queue sizes)
+ * TODO Provide status information (queue sizes)
  */
 export class PipeHttpServer {
     port: number;
@@ -99,12 +97,13 @@ export class PipeHttpServer {
             response.statusCode = 200;
             // TODO Store the data in the pipe here!
             // Store the data asynchronously and providing the response back, when finished.
-            let document = "";
+            let documentString = "";
             request.on("data", (chunk: string) => {
-                logger.debug("PipeHttpServer.put(): read '%s'", document);
+                logger.debug("PipeHttpServer.put(): read chunk '%s'", chunk);
+                documentString += chunk;
             });
             request.on("end", () => {
-                this.pipe.push(document);
+                this.pipe.push(JSON.parse(documentString));
                 response.end("Ok");
             });
         }

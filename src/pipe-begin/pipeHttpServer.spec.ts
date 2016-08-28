@@ -28,7 +28,7 @@ describe("The pipe http server", () => {
             fail("Request failed due to: " + err);
             done();
         });
-        clientRequest.write(querystring.stringify(testDocument));
+        clientRequest.write(JSON.stringify(testDocument));
         clientRequest.end();
     }
 
