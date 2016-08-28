@@ -1,9 +1,21 @@
 /**
  * This file contains the configuration of the local pipes.
  */
+import * as fs from "fs";
+import * as bunyan from "bunyan";
+import {mainLoggerConfig} from "./loggerConfig";
+import {Contains, IsAlphanumeric, IsNumeric, IsFQDN} from "validator.ts/decorator/Validation.d.ts";
 
-export type ListenerConfig = {port: number, hostname: string};
-export type FileConfig = {location: string};
+export class ListenerConfig {
+    //@IsNumeric() 
+    port: number; 
+    //@IsFQDN() 
+    hostname: string
+};
+export class FileConfig {
+    location: string; 
+    pattern: string /* defaults to "${p}.${id}.json" */
+};
 export type PipeConfig = {
     name: string, 
     description?: string, 
@@ -14,32 +26,20 @@ export type PipeConfig = {
 }
 
 // TODO Logic for reading JSON files from the configuration directory goes here.
+var logger = bunyan.createLogger(mainLoggerConfig);
 
-export const pipes: PipeConfig[] = [
-    {
-        name: "config",
-        description: "This is the way to configure the network of pipes.",
-        beginType: "http",
-        beginConfig: {
-            port: 8081,
-            hostname: "localhost" // Makes sure, that the service is just locally reachable!
-        },
-        endType: "file",
-        endConfig: {
-            location: "../config/"
+export function loadPipeConfig(location: string = './config'): PipeConfig[] {
+    let result: PipeConfig[] = [];
+    let files = fs.readdirSync(location);
+    files.forEach((file: string) => {
+        let path = location + '/' + file;
+        logger.debug('loadPipeConfig(): found "%s".', file);
+        if (file.match('[a-zA-Z_]+.pipe.json')
+            && fs.statSync(path).isFile()) {
+            logger.debug('loadPipeConfig(): read a pipe configuration from: %s', path);
+            let pipeConfig: PipeConfig = JSON.parse(fs.readFileSync(path, 'utf8'));
+            result.push(pipeConfig);
         }
-    },
-    {
-        name: "master-data",
-        beginType: "http",
-        beginConfig: {
-            port: 8081,
-            hostname: "localhost"
-        },
-        endType: "http",
-        endConfig: {
-            port: 8081,
-            hostname: "remote.host.ip"
-        }
-    }
-];
+    });
+    return result;
+}

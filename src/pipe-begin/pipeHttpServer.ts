@@ -6,7 +6,7 @@ import * as http from "http";
 import * as async from "async";
 
 import {pipeHttpServerLoggerConfig} from "../loggerConfig";
-import {ListenerConfig, PipeConfig, pipes} from "../pipeConfig";
+import {ListenerConfig, PipeConfig} from "../pipeConfig";
 import {Pipe, PipeCallback} from "../pipes/pipe";
 
 var logger = bunyan.createLogger(pipeHttpServerLoggerConfig);
@@ -95,50 +95,8 @@ export class PipeHttpServer {
         response.end("end");
     }
 
-    /**
-     * Start all the configured pipe begin services.
-     * @param callback Will be called, if the services are started.
-     */
-    private oldstart(callback: (err: any) => void) {
-        logger.info("PipeHttpServer.start(): Starting service...");
-        this.readConfig();
-        async.series([
-            (cb) => {
-                this.createPipes(cb);
-            },
-            (cb) => {
-                logger.debug("PipeHttpServer.start(): start listening...");
-                // TODO: Create a server for every individual configured server port.
-                // Unfortunately, this requires a different approach!
-                this.server.listen(8081, "localhost", cb);
-            }
-        ], (err: any) => {
-            if (err) {
-                logger.error("PipeHttpServer.start(): Couldn't start server due to: " + err);
-            }
-            callback(err);
-        });
-    }
-
     public close() {
         this.server.close();
-    }
-
-    /**
-     * Reads all begin configuration type 'http'.
-     */
-    private readConfig(): void {
-        logger.debug("PipeHttpServer.readConfig()");
-        this.pipeConfigs = [];
-        pipes.forEach((element: PipeConfig) => {
-            if (element.beginType === 'http') {
-                logger.debug("PipeHttpServer.readConfig(): " + element.name + " " + element.description 
-                            + "(" + (<ListenerConfig>element.beginConfig).hostname
-                            + ":" + (<ListenerConfig>element.beginConfig).port + ")");
-                this.pipeConfigs.push(element);
-            }
-        });
-        logger.debug("PipeHttpServer.readConfig(): finished.")
     }
 
     /**

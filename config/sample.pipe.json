@@ -1,0 +1,8 @@
+{
+    "name": "sample",
+    "description": "Provides an example on how to configure a pipe.",
+    "beginType": "http",
+    "beginConfig": {"port": 8090, "hostname": "localhost"},
+    "endType": "file",
+    "endConfig": {"location": "sample-data", "pattern": "${p}.${id}"}
+}

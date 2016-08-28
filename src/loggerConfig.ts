@@ -3,12 +3,12 @@
 import * as bunyan from "bunyan";
 
 var commonStream = {
-    level: 'info',
+    level: 'debug',
     path: 'common.log.json'
 };
 
 var serverStream = {
-    level: 'debug',
+    level: 'info',
     path: 'server.log.json'
 };
 
@@ -32,4 +32,10 @@ export var pipeHttpServerLoggerConfig: bunyan.LoggerOptions = {
     name: "PipeHttpServerLogger",
     level: 'info',
     streams: [commonStream, serverStream, errorStream]
+}
+
+export var mainLoggerConfig: bunyan.LoggerOptions = {
+    name: "MainLogger",
+    level: 'info',
+    streams: [commonStream, errorStream]
 }

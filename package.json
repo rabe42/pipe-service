@@ -32,6 +32,8 @@
   "dependencies": {
     "async": "^2.0.1",
     "bunyan": "^1.8.1",
-    "cradle": "^0.7.1"
+    "cradle": "^0.7.1",
+    "glob": "^7.0.6",
+    "validator.ts": "^0.2.2"
   }
 }
