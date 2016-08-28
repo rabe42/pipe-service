@@ -21,10 +21,10 @@ var del = require('del');
 var tsProject = ts.createProject("tsconfig.json");
 
 var srcs = ['src/**/*.ts'];
-var tests = ['dist/**/*.spec.js'];
+var tests = ['lib/**/*.spec.js'];
 
-gulp.task("clean:dist", function() {
-    return del(['dist/**/*']);
+gulp.task("clean:lib", function() {
+    return del(['lib/**/*']);
 });
 
 gulp.task("clean:logs", function() {
@@ -35,7 +35,7 @@ gulp.task('clean:coverage', function() {
     return del(['coverage', 'coverage-remapped']);
 });
 
-gulp.task("clean:all", ['clean:dist', 'clean:logs', 'clean:coverage']);
+gulp.task("clean:all", ['clean:lib', 'clean:logs', 'clean:coverage']);
 
 gulp.task("transpile", function() {
     var tsResult = gulp.src(srcs)
@@ -48,7 +48,7 @@ gulp.task("transpile", function() {
                 return file.cwd + '/src';
             } 
         }))
-        .pipe(gulp.dest("dist"));
+        .pipe(gulp.dest("lib"));
 });
 
 gulp.task("test", ["clean:logs", "transpile"], function() {
@@ -57,7 +57,7 @@ gulp.task("test", ["clean:logs", "transpile"], function() {
 });
 
 gulp.task('pre:istanbul', ['clean:logs', 'clean:coverage', 'transpile'], function () {
-    return gulp.src(['!dist/**/*.spec.js', 'dist/**/*.js'])
+    return gulp.src(['!lib/**/*.spec.js', 'lib/**/*.js'])
         .pipe(istanbul())
         .pipe(istanbul.hookRequire());
 });

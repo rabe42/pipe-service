@@ -5,7 +5,7 @@
             "name": "Starten",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceRoot}/dist/main.js",
+            "program": "${workspaceRoot}/lib/main.js",
             "stopOnEntry": false,
             "args": [],
             "cwd": "${workspaceRoot}",
@@ -19,7 +19,7 @@
             },
             "externalConsole": false,
             "sourceMaps": true,
-            "outDir": "${workspaceRoot}/dist/"
+            "outDir": "${workspaceRoot}/lib/"
         },
         {
             "name": "Anfügen",
@@ -60,7 +60,7 @@
             },
             "externalConsole": false,
             "sourceMaps": true,
-            "outDir": "${workspaceRoot}/dist/"
+            "outDir": "${workspaceRoot}/lib/"
         }
     ]
 }
