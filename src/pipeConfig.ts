@@ -25,26 +25,46 @@ export class PipeConfig {
     endConfig: ListenerConfig|FileConfig
 }
 
-// TODO Logic for reading JSON files from the configuration directory goes here.
 var logger = bunyan.createLogger(mainLoggerConfig);
 
-/**
- * Load the pipe configuration from a given directory.
- * @param location The directory to read the file from.
- * @return An array of PipeConfig.
- */
-export function loadPipeConfig(location: string = './config'): PipeConfig[] {
-    let result: PipeConfig[] = [];
-    let files = fs.readdirSync(location);
-    files.forEach((file: string) => {
-        let path = location + '/' + file;
-        logger.debug('loadPipeConfig(): found "%s".', file);
-        if (file.match('[a-zA-Z_]+.pipe.json')
-            && fs.statSync(path).isFile()) {
-            logger.debug('loadPipeConfig(): read a pipe configuration from: %s', path);
-            let pipeConfig: PipeConfig = JSON.parse(fs.readFileSync(path, 'utf8'));
-            result.push(pipeConfig);
-        }
-    });
-    return result;
-}
+export class PipeConfigurations {
+    private configs: PipeConfig[] = [];
+
+    constructor(location: string = './config') {
+        this.loadPipeConfig(location);
+    }
+
+    /**
+     * Load the pipe configuration from a given directory.
+     * @param location The directory to read the file from.
+     * @return An array of PipeConfig.
+     */
+    private loadPipeConfig(location: string = './config'): void {
+        let files = fs.readdirSync(location);
+        files.forEach((file: string) => {
+            let path = location + '/' + file;
+            logger.debug('loadPipeConfig(): found "%s".', file);
+            if (file.match('[a-zA-Z_]+.pipe.json')
+                && fs.statSync(path).isFile()) {
+                logger.debug('loadPipeConfig(): read a pipe configuration from: %s', path);
+                let pipeConfig: PipeConfig = JSON.parse(fs.readFileSync(path, 'utf8'));
+                this.configs.push(pipeConfig);
+            }
+        });
+    }
+
+    public length(): number {
+        return this.configs.length;
+    }
+
+    public findBeginByType(aType: string): PipeConfig[] {
+        let result: PipeConfig[] = [];
+        this.configs.forEach((config) => {
+            if (config.beginType && config.beginType == aType) {
+                result.push(config);
+            }
+        });
+        return result;
+    }
+
+};
