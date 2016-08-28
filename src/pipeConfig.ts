@@ -67,4 +67,13 @@ export class PipeConfigurations {
         return result;
     }
 
+    public findEndByType(aType: string): PipeConfig[] {
+        let result: PipeConfig[] = [];
+        this.configs.forEach((config) => {
+            if (config.endType && config.endType == aType) {
+                result.push(config);
+            }
+        });
+        return result;
+    }
 };

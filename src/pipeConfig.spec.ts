@@ -12,4 +12,12 @@ describe("Load pipe config", () => {
         expect(pipeConfigs).toBeDefined();
         expect(pipeConfigs.length()).toBe(2);
     });
+    it("should provide the http begin types in the configuration directories.", () => {
+        let pipeConfigs = new PipeConfigurations('tests/config');
+        expect(pipeConfigs.findBeginByType('http').length).toBe(1);
+    });
+    it("should provide the file end types.", () => {
+        let pipeConfigs = new PipeConfigurations('tests/config');
+        expect(pipeConfigs.findEndByType('file').length).toBe(1);
+    });
 });
