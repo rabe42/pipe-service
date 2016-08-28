@@ -90,8 +90,8 @@ export class PipeHttpServer {
      * @param response The http response object, where the result has to be communicated.
      */
     private put(request: http.IncomingMessage, response: http.ServerResponse): void {
-        logger.info("PipeHttpServer.put(): Service called.")
-        if (request.url !== this.pipe.name) {
+        logger.info("PipeHttpServer.put(): Service called with url='%s'", request.url);
+        if (request.url !== '/' + this.pipe.name) {
             response.statusCode = 404;
             response.end("Pipe not managed by this service.");
         }
@@ -101,7 +101,7 @@ export class PipeHttpServer {
             // Check, if the pipe is managed by this service.
             // Store the data asynchronously and providing the response back, when finished.
 
-            response.end("end");
+            response.end("Ok");
         }
     }
 
