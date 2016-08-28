@@ -7,7 +7,7 @@ import {mainLoggerConfig} from "./loggerConfig";
 import {Contains, IsAlphanumeric, IsNumeric, IsFQDN} from "validator.ts/decorator/Validation.d.ts";
 
 export class ListenerConfig {
-    //@IsNumeric() 
+    //@IsNumeric() -- Jasmine is not ready for this.
     port: number; 
     //@IsFQDN() 
     hostname: string
@@ -16,18 +16,23 @@ export class FileConfig {
     location: string; 
     pattern: string /* defaults to "${p}.${id}.json" */
 };
-export type PipeConfig = {
-    name: string, 
-    description?: string, 
-    beginType: string, 
-    beginConfig: ListenerConfig|FileConfig, 
-    endType: string,
+export class PipeConfig {
+    name: string; 
+    description: string; 
+    beginType: string; 
+    beginConfig: ListenerConfig|FileConfig; 
+    endType: string;
     endConfig: ListenerConfig|FileConfig
 }
 
 // TODO Logic for reading JSON files from the configuration directory goes here.
 var logger = bunyan.createLogger(mainLoggerConfig);
 
+/**
+ * Load the pipe configuration from a given directory.
+ * @param location The directory to read the file from.
+ * @return An array of PipeConfig.
+ */
 export function loadPipeConfig(location: string = './config'): PipeConfig[] {
     let result: PipeConfig[] = [];
     let files = fs.readdirSync(location);
