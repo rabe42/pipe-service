@@ -114,7 +114,6 @@ export class Pipe {
      */
     private checkIsEmpty(callback: PipeCallback, force?: boolean): void {
         var dbInfo = this.dbConnection.info((err: any, dbInfo: any) => {
-            logger.info("Database info: " + dbInfo);
             if (err) {
                 logger.error(this.name + "::Pipe.databaseIsEmpty(): failed due to: " + err);
                 callback(err);
@@ -200,8 +199,25 @@ export class Pipe {
                 pipeCallback(err, result);
             }
             else {
+                logger.error(this.name + '::Pipe.peek(): unexpected result!');
                 pipeCallback("Unexpected result!", null);
             }
+        });
+    }
+
+    /**
+     * Provides the length of the pipe in the callback, provided here.
+     * @param callback Called for providing error or result.
+     */
+    public length(callback: PipeCallback): void {
+        var dbInfo = this.dbConnection.info((err: any, dbInfo: any) => {
+            logger.debug(this.name + "::Pipe.length(): Database info: " + dbInfo);
+            if (err) {
+                logger.error(this.name + "::Pipe.databaseIsEmpty(): failed due to: " + err);
+                callback(err);
+                return;
+            }
+            callback(null, dbInfo.doc_count - 1); // Without the view document!
         });
     }
 
