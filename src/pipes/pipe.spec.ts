@@ -76,6 +76,15 @@ describe("The pipe interface:", () => {
             done(); 
         });
     });
+    it("should have three elements in the pipe.", (done) => {
+        aPipe.length((err, res) => {
+            if (err) {
+                fail("With error: " + err);
+            }
+            expect(res).toBe(3);
+            done();
+        });
+    });
     it("should substitute the space in the pibe name by underscores", () => {
         expect(aPipe.databaseName()).toBe("test_pipe");
     });
