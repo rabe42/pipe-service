@@ -21,21 +21,22 @@ describe("http service", () => {
     server2.listen(8082, "localhost");
 
     function request(method: string, port: number, expectedResponse: string, expectedStatus: number, callback: () => void): void {
-        var responseConent = "";
+        var responseContent = "";
         let clientRequest = http.request({hostname: "localhost", port: port, method: method, path: "/"},
             (result: http.IncomingMessage) => {
                 result.setEncoding('utf8');
                 result.on('data', (chunk: any) => {
-                    responseConent += chunk;
+                    responseContent += chunk;
                 });
                 result.on('end', () => { 
-                    expect(responseConent).toBe(expectedResponse);
+                    expect(responseContent).toBe(expectedResponse);
                     expect(result.statusCode).toBe(expectedStatus);
                     callback();
                  });
             });
         clientRequest.on('error', (err: any) => {
             fail("Request failed due to: " + err);
+            callback();
         });
         clientRequest.end();
     };
@@ -48,25 +49,25 @@ describe("http service", () => {
             this.port = port;
             this.server = http.createServer(this.serve);
             // Adding the parent to the server instace, provides access to this object later on.
-            this.server.parent = this;
+            this.server.service = this;
             this.server.listen(this.port, "localhost");
         }
         /** 
          * This is an alien!
          */
         private serve(request: http.IncomingMessage, response: http.ServerResponse) {
-            // Casting the this to the parent object, as this will be the server at the point, the method is called.
+            // Casting the this to the service object, as this will be the server at the point, the method is called.
             if (request.method === "GET") {
-                (<any>this).parent.get(request, response);
+                (<any>this).service.get(request, response);
             }
             else if (request.method === "PUT") {
-                (<any>this).parent.put(request, response);
+                (<any>this).service.put(request, response);
             }
             else if (request.method === "POST") {
-                (<any>this).parent.post(request, response);
+                (<any>this).service.post(request, response);
             }
             else if (request.method === "DELETE") {
-                (<any>this).parent.remove(request, response);
+                (<any>this).service.remove(request, response);
             }
         }
         get(request: http.IncomingMessage, response: http.ServerResponse) {
