@@ -11,8 +11,8 @@ import {pipeHttpServerLoggerConfig} from "../loggerConfig";
 var logger = bunyan.createLogger(pipeHttpServerLoggerConfig);
 
 describe("A asynchronous http service", () => {
-    var server1Request: http.IncomingMessage;
-    var server1: http.Server = http.createServer((request: http.IncomingMessage, response: http.ServerResponse) => {
+    let server1Request: http.IncomingMessage;
+    let server1: http.Server = http.createServer((request: http.IncomingMessage, response: http.ServerResponse) => {
         logger.debug("asyncHttp.spec.server1.createServer.callback(%s): processing request.", request.url);
         server1Request = request;
         setTimeout(() => {
@@ -25,9 +25,11 @@ describe("A asynchronous http service", () => {
     });
     server1.listen(9091, "localhost");
 
-    var server2: http.Server = http.createServer((request: http.IncomingMessage, response: http.ServerResponse) => {
+    let pipe: Pipe;
+
+    let server2: http.Server = http.createServer((request: http.IncomingMessage, response: http.ServerResponse) => {
         logger.debug("asyncHttp.spec.server2.createServer.callback(%s): processing request.", request.url);
-        let pipe = new Pipe("asyncTest");
+        pipe = new Pipe("asyncTest");
         async.series([
             (cb) => {
                 pipe.init(cb);
@@ -42,7 +44,7 @@ describe("A asynchronous http service", () => {
                 response.end("NOK");
             }
             else {
-                logger.debug("asyncHttp.spec.server2.createServer.callbakc(%s): succeded.");
+                logger.debug("asyncHttp.spec.server2.createServer.callback(%s): succeded.", request.url);
                 response.statusCode = 200;
                 response.end("Ok:" + res[1]);
             }
@@ -51,7 +53,7 @@ describe("A asynchronous http service", () => {
     server2.listen(9092, "localhost");
 
     function request(method: string, port: number, expectedResponse: string, expectedStatus: number, callback: () => void): void {
-        var responseContent = "";
+        let responseContent = "";
         let clientRequest = http.request({hostname: "localhost", port: port, method: method, path: "/"},
             (result: http.IncomingMessage) => {
                 result.setEncoding('utf8');
@@ -93,5 +95,8 @@ describe("A asynchronous http service", () => {
     })
     it("should be possible to close the 2nd service.", () => {
         server2.close();
+    });
+    it("should be possible to destroy the pipe.", (done) => {
+        pipe.destroy(done);
     });
 });
