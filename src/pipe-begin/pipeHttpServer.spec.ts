@@ -34,7 +34,8 @@ describe("The pipe http server", () => {
             fail("Request failed due to: " + err);
             return done();
         });
-        clientRequest.write(JSON.stringify(testDocument));
+        let strDoc = JSON.stringify(testDocument);
+        clientRequest.write(strDoc);
         clientRequest.end();
     }
 
@@ -106,7 +107,7 @@ describe("The pipe http server", () => {
     });
     it("should deliver the status.", (done) => {
         logger.debug("pipeHttpServer.spec: 4");
-//        getRequest("serverTest1", 200, 0, done);
+        getRequest("serverTest1", 200, 0, done);
         return done();
     });
     it("should store the document.", (done) => {

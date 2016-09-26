@@ -105,14 +105,6 @@ export class PipeHttpServer {
         logger.debug("PipeHttpServer.get(%s): end", this.pipeName);
     }
 
-    private retrieveStatusSync(response: http.ServerResponse): void {
-        let statusDocument: any = {};
-        statusDocument.name = this.pipe.name;
-        statusDocument.length = 0;
-        response.writeHead(200, {"Content-Type": "application/json"});
-        response.end(JSON.stringify(statusDocument));
-    }
-
     private retrieveStatus(response: http.ServerResponse): void {
         logger.debug("PipeHttpServer.retrieveStatus(): initiating request to pipe store...");
         this.pipe.length((err, res) => {
