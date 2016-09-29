@@ -187,6 +187,7 @@ export class PipeHttpServer {
     }
 
     public destroyPipe(callback: PipeCallback) {
-        this.pipe.destroy(callback);
+        logger.info("PipeHttpServer.destroyPipe(): Destroying associated pipe '%s'.", this.pipe.name);
+        this.pipe.destroy(callback, true);
     }
 };
