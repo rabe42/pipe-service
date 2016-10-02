@@ -1,6 +1,6 @@
 /// <reference path="../../typings/jasmine/jasmine.d.ts"/>
 
-import {Pipe} from "./pipe";
+import {Pipe, PipeListener} from "./pipe";
 
 describe("The pipe interface:", () => {
 
@@ -9,7 +9,14 @@ describe("The pipe interface:", () => {
     var aNewPipe: Pipe;
     var payload1 = {name: "Skywalker", firstName: "Anakin"};
     var payload2 = {name: "Skywalker", firstName: "Luke"};
+    let notified = false;
 
+    class PipeWatcher implements PipeListener {
+        public notify(pipe: Pipe): void {
+            notified = true
+        }
+    }
+    let pipeWatcher = new PipeWatcher()
 
     it("should create a pipe", () => {
         aPipe = new Pipe("Test Pipe", ["http://x.y.z"]);
@@ -35,7 +42,8 @@ describe("The pipe interface:", () => {
             }
             done();
         });
-    });
+    })
+
     it("should not be possible to initialize failed pipe", (done) => {
         aFailedPipe.init((err, res) => {
             if (!err) {
@@ -43,7 +51,12 @@ describe("The pipe interface:", () => {
             }
             done();
         });
-    });
+    })
+
+    it("should be possible to set a listener.", () => {
+        aPipe.setListener(pipeWatcher)
+    })
+
     it("should save a simple payload", (done) => {
         aPipe.push("A first payload.", (err: any, res: any) => { 
             if (err) {
@@ -51,7 +64,8 @@ describe("The pipe interface:", () => {
             }
             done(); 
         });
-    });
+    })
+
     it("should not save a simple payload to a the failed pipe", (done) => {
         aFailedPipe.push("A simple payload.", (err: any, res: any) => {
             if (!err) {
@@ -59,7 +73,8 @@ describe("The pipe interface:", () => {
             }
             done();
         })
-    });
+    })
+
     it("should save complex payloads", (done) => {
         aPipe.push(payload1, (err: any, res: any) => { 
             if (err) {
@@ -67,7 +82,14 @@ describe("The pipe interface:", () => {
             }   
             done(); 
         });
-    });
+    })
+
+    it("should have been notified.", () => {
+        expect(notified).toBeTruthy()
+        notified = false
+    })
+
+
     it("should save the third payload", (done) => {
         aPipe.push(payload2, (err: any, res: any) => { 
             if (err) {

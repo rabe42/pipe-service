@@ -34,6 +34,13 @@ var defaultCallback: PipeCallback = () => {
 };
 
 /**
+ * Defines an interface which allows to notify that the pipe has data inside.
+ */
+export interface PipeListener {
+    notify(pipe: Pipe): void;
+}
+
+/**
  * Implements a simple push pipe, with the given name and destination.
  * It implements a simple store and forward logic.
  * The implementation requires, that the setup of the uuid algorithm is changed with this command:
@@ -45,6 +52,7 @@ export class Pipe {
     name: string;
     dbSpec: any;
     private dbConnection: cradle.Database;
+    private listener: PipeListener;
 
     constructor(name: string, dbSpec?: any) {
         this.name = name;
@@ -73,6 +81,18 @@ export class Pipe {
      */
     public databaseName(): string {
         return this.name.replace(" ", "_").toLowerCase();
+    }
+
+    /**
+     * Allows to define a listner, who will be notified, if data is available.
+     * If the listener is substituted, a warning is issued.
+     * @param listener The new content listener.
+     */
+    public setListener(listener: PipeListener): void {
+        if (this.listener) {
+            logger.warn(this.name + "::Pipe.setListener(): Listener will be substituted. This might result in unexpected end point behaviour.")
+        }
+        this.listener = listener
     }
 
     /**
@@ -175,7 +195,10 @@ export class Pipe {
                 logger.error(this.name + "::Pipe.push() wasn't possible due to: " + err);
             }
             else {
-                logger.info(this.name + "::Pipe.push() successful.");
+                logger.info(this.name + "::Pipe.push() successful.")
+                if (this.listener) {
+                    this.listener.notify(this)
+                }
             }
             pipeCallback(err, res);
         });
