@@ -20,8 +20,14 @@ var del = require('del');
 
 var tsProject = ts.createProject("tsconfig.json");
 
-var srcs = ['src/**/*.ts'];
+var srcs = ['src/**/*.ts', 'typings/**/*.d.ts'];
 var tests = ['lib/**/*.spec.js'];
+
+gulp.task("init", function () {
+    // TODO: Simplify the installation
+    // npm install
+    // typings install
+});
 
 gulp.task("clean:lib", function() {
     return del(['lib/**/*']);

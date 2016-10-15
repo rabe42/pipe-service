@@ -34,6 +34,7 @@
     "bunyan": "^1.8.1",
     "cradle": "^0.7.1",
     "glob": "^7.0.6",
+    "string-template": "^1.0.0",
     "validator.ts": "^0.2.2"
   }
 }

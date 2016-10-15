@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "async": "registry:npm/async#2.0.1+20160815105832",
+    "string-template": "registry:npm/string-template#1.0.0+20160723033700"
+  }
+}

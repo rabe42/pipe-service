@@ -1,5 +1,4 @@
 /// <reference path="../../typings/bunyan/bunyan.d.ts" />
-/// <reference path="../../typings/async/async.d.ts"/>
 
 import * as bunyan from "bunyan";
 import * as http from "http"; 

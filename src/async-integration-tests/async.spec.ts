@@ -1,5 +1,4 @@
 /// <reference path="../../typings/jasmine/jasmine.d.ts"/>
-/// <reference path="../../typings/async/async.d.ts" />
 /// <reference path="../../typings/cradle/cradle.d.ts" />
 
 import * as async from "async";
