@@ -1,6 +1,3 @@
-/// <reference path="../../typings/jasmine/jasmine.d.ts"/>
-/// <reference path="../../typings/bunyan/bunyan.d.ts"/>
-
 import * as http from "http";
 import * as querystring from "querystring";
 import * as bunyan from "bunyan";

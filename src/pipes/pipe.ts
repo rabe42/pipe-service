@@ -1,6 +1,3 @@
-/// <reference path="../../typings/bunyan/bunyan.d.ts" />
-/// <reference path="../../typings/cradle/cradle.d.ts" />
-/// <reference path="../../typings/async/async.d.ts" />
 /// <reference path="../loggerConfig.ts" />
 
 // import bunyan from "bunyan";            // Module bunyan has no default export.

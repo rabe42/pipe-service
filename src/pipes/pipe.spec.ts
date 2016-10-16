@@ -1,5 +1,3 @@
-/// <reference path="../../typings/jasmine/jasmine.d.ts"/>
-
 import {Pipe, PipeListener} from "./pipe";
 
 describe("The pipe interface:", () => {
@@ -89,7 +87,6 @@ describe("The pipe interface:", () => {
         notified = false
     })
 
-
     it("should save the third payload", (done) => {
         aPipe.push(payload2, (err: any, res: any) => { 
             if (err) {
@@ -97,7 +94,8 @@ describe("The pipe interface:", () => {
             }   
             done(); 
         });
-    });
+    })
+
     it("should have three elements in the pipe.", (done) => {
         aPipe.length((err, res) => {
             if (err) {
@@ -106,7 +104,8 @@ describe("The pipe interface:", () => {
             expect(res).toBe(3);
             done();
         });
-    });
+    })
+
     it("should substitute the space in the pibe name by underscores", () => {
         expect(aPipe.databaseName()).toBe("test_pipe");
     });

@@ -1,4 +1,3 @@
-/// <reference path="../typings/jasmine/jasmine.d.ts"/>
 import {PipeConfigurations} from "./pipeConfig";
 
 describe("Load pipe config", () => {

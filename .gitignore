@@ -4,3 +4,4 @@ lib
 coverage
 coverage-remapped
 typings/modules
+typings/globals

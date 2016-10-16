@@ -1,41 +1,50 @@
-/// <reference path="../typings/bunyan/bunyan.d.ts" />
-
 import * as bunyan from "bunyan";
 
-var commonStream = {
+let commonStream = {
     level: 'debug',
     path: 'common.log.json'
 };
 
-var serverStream = {
-    level: 'debug',
+let serverStream = {
+    level: 'info',
     path: 'server.log.json'
 };
 
-var pipeStream = {
+let pipeStream = {
     level: 'info',
     path: './pipe.log.json'
 };
 
-var errorStream = {
+let errorStream = {
     level: 'error',
     path: 'error.log.json'
 }
 
-export var pipeLoggerConfig: bunyan.LoggerOptions = {
+let fileStream = {
+    level: 'info',
+    path: 'file.log.json'
+}
+
+export let pipeLoggerConfig: bunyan.LoggerOptions = {
     name: "PipeLogger",
     level: 'info', 
     streams: [commonStream, pipeStream, errorStream]
 };
 
-export var pipeHttpServerLoggerConfig: bunyan.LoggerOptions = {
+export let pipeHttpServerLoggerConfig: bunyan.LoggerOptions = {
     name: "PipeHttpServerLogger",
     level: 'info',
     streams: [commonStream, serverStream, errorStream]
 }
 
-export var mainLoggerConfig: bunyan.LoggerOptions = {
+export let mainLoggerConfig: bunyan.LoggerOptions = {
     name: "MainLogger",
     level: 'info',
     streams: [commonStream, errorStream]
+}
+
+export let fileLoggerConfig: bunyan.LoggerOptions = {
+    name: "FileLogger",
+    level: 'info',
+    streams: [commonStream, fileStream]
 }

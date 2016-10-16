@@ -1,6 +1,3 @@
-/// <reference path="../../typings/jasmine/jasmine.d.ts"/>
-/// <reference path="../../typings/cradle/cradle.d.ts" />
-
 import * as async from "async";
 import * as cradle from "cradle";
 
