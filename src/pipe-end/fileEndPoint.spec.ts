@@ -22,8 +22,12 @@ describe("A file end point", () => {
     }
 
     afterAll((done) => {
-        pipe.destroy(done, true)
         // TODO Delete directory
+        let files = fs.readdirSync(fepData)
+        files.forEach((file) => { 
+            fs.unlinkSync(fepData + "/" + file)
+         })
+        pipe.destroy(done, true)
     })
 
     it("should initialize the pipe", (done) => {
