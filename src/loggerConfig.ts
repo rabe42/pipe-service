@@ -1,7 +1,7 @@
 import * as bunyan from "bunyan";
 
 let commonStream = {
-    level: 'debug',
+    level: 'info',
     path: 'common.log.json'
 };
 
@@ -21,7 +21,7 @@ let errorStream = {
 }
 
 let fileStream = {
-    level: 'info',
+    level: 'debug',
     path: 'file.log.json'
 }
 
