@@ -112,7 +112,7 @@ export class Pipe {
                 callback(null, exists);
             }
             else {
-                this.dbConnection.create((err) => {
+                this.dbConnection.create((err: Error) => {
                     if (err) {
                         logger.error(this.name + "::Pipe.constructor(): wasn't able to create database due to: " + err);
                         callback(err);
