@@ -40,7 +40,7 @@ export interface PipeListener {
 /**
  * Implements a simple push pipe, with the given name and destination.
  * It implements a simple store and forward logic.
- * The implementation requires, that the setup of the uuid algorithm is changed with this command:
+ * The implementation requires, that the setup of the CoucheDB uuid algorithm is changed with this command:
  * curl -X PUT http://localhost:5984/_config/uuids/algorithm -d '"sequential"'
  *
  * @author Dr. Ralf Berger
