@@ -34,13 +34,36 @@ describe("A file end point", () => {
             pipe.init(done)
     })
 
-    it("should fail to be initialized on a non existing directory.", (done) => {
+    it("should fail to be initialized on a non existing directory.", () => {
         try {
             new FileEndPoint(pipe, "xxx")
             fail("It is possible to create a file end point for a non existing directory.")
         }
         catch (err) {}
-        return done()
+    })
+
+    it("should fail to initialize without pipe.", () => {
+        try {
+            new FileEndPoint(null, fepData)
+            fail("It is possible to create a file end point without pipe.")
+        }
+        catch (err) {}
+    })
+
+    it("should fail to initialize without location.", () => {
+        try {
+            new FileEndPoint(pipe, null)
+            fail("It is possible to create a file end point without any locltion.")
+        }
+        catch (err) {}
+    })
+
+    it("should fail to initialize for a file.", () => {
+        try {
+            new FileEndPoint(pipe, "./tests/fepFile")
+            fail("It is possible to create a file end point for a file.")
+        }
+        catch (err) {}
     })
 
     it("should be possible to create a file end point for an existing directory.", () => {
@@ -52,7 +75,9 @@ describe("A file end point", () => {
 
     it ("should close the without data end point.", (done) => {
         setTimeout(() => {
-            fepUnderTest.close()
+            if (fepUnderTest != undefined && fepUnderTest != null) {
+                fepUnderTest.close()
+            }
             done()
         }, 500)
     })
@@ -78,7 +103,9 @@ describe("A file end point", () => {
 
     it("should close the end point after data are read from the pipe.", (done) => {
         setTimeout(() => {
-            fepUnderTest.close()
+            if (fepUnderTest != undefined && fepUnderTest != null) {
+                fepUnderTest.close()
+            }
             done()
         }, 500)
     })

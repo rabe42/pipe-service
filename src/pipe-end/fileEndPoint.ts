@@ -16,7 +16,7 @@ var logger = bunyan.createLogger(fileLoggerConfig)
  * The provided location must be a directory.
  * It runs as a service and collecting the data from the pipe.
  */
-export class FileEndPoint implements PipeListener {
+export class FileEndPoint {
 
     location: string // The location, where the pipe entries have to be stored.
     pattern: string // used to create the file name from the pipe.
@@ -40,7 +40,8 @@ export class FileEndPoint implements PipeListener {
             logger.error("FileEndPoint.constructor(): No location provided!")
             throw new Error("No location provided!")
         }
-        if (!fs.statSync(location).isDirectory()) {
+        let stat = fs.statSync(location)
+        if (!stat.isDirectory()) {
             logger.error("FileEndPoint.constructor(): Given location '%s' is not a directoy.", location)
             throw new Error("Given location is no directory: " + location)
         }
@@ -104,9 +105,5 @@ export class FileEndPoint implements PipeListener {
      */
     public close(): void {
         clearInterval(this.timer)
-    }
-
-    public notify(pipe: Pipe): void {
-        // Make sure, that the service fetches objects from the pipe
     }
 };
