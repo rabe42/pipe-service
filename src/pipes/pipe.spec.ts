@@ -27,8 +27,11 @@ describe("The pipe interface:", () => {
     });
     it("should deliver merged connection properties", () => {
         let connectionProperties = aPipe.connectionParameter({host: "a.b.c"});
-        expect(connectionProperties.host).toBe("a.b.c");
-        expect(connectionProperties.port).toBe(5984);
+        expect(connectionProperties).toBeDefined();
+        if (connectionProperties) {
+            expect(connectionProperties.host).toBe("a.b.c");
+            expect(connectionProperties.port).toBe(5984);
+        }
     })
     it("should have a name", () => {
         expect(aPipe.name).toEqual("Test Pipe");
@@ -143,19 +146,21 @@ describe("The pipe interface:", () => {
                 fail("couldn't peek data from pipe due to: " + err);
             }
             expect(message).toBeDefined();
-            expect(message.payload).toBeDefined();
-            expect(message.payload).toBe("A first payload.");
-            aPipe.remove(message, (err: any, result: any) => {
-                if (err) {
-                    fail("Couldn't delete message due to: " + err)
-                }
-                aPipe.remove(message, (err: any) => {
-                    if (!err) {
-                        fail("Could delete message twice!");
+            if (message) {
+                expect(message.payload).toBeDefined();
+                expect(message.payload).toBe("A first payload.");
+                aPipe.remove(message, (err: any, result: any) => {
+                    if (err) {
+                        fail("Couldn't delete message due to: " + err)
                     }
-                    done();
+                    aPipe.remove(message, (err: any) => {
+                        if (!err) {
+                            fail("Could delete message twice!")
+                        }
+                        done()
+                    })
                 });
-            });
+            }
         });
     });
     it("should retrieve and delete the next message", (done) => {
@@ -164,34 +169,44 @@ describe("The pipe interface:", () => {
                 fail("Couldn't peek data from pipe due to: " + err);
             }
             expect(message).toBeDefined();
-            expect(message.payload).toBeDefined();
-            expect(message.payload.firstName).toBe(payload1.firstName);
-            expect(message.payload.name).toBe(payload1.name);
-            aPipe.remove(message, (err: any, result: any) => {
-                if (err) {
-                    fail("Couldn't delete message due to: " + err)
+            if (message) {
+                expect(message.payload).toBeDefined();
+                if (message.payload) {
+                    expect(message.payload.firstName).toBe(payload1.firstName);
+                    expect(message.payload.name).toBe(payload1.name);
+                    aPipe.remove(message, (err: any, result: any) => {
+                        if (err) {
+                            fail("Couldn't delete message due to: " + err)
+                        }
+                        done();
+                    });
                 }
-                done();
-            });
+            }
         });
-    });
+    })
+
     it("should retrieve and delete the last message", (done) => {
         aPipe.peek((err: any, message: any) => {
             if (err) {
-                fail("Couldn't peek data from pipe due to: " + err);
+                fail("Couldn't peek data from pipe due to: " + err)
             }
-            expect(message).toBeDefined();
-            expect(message.payload).toBeDefined();
-            expect(message.payload.firstName).toBe(payload2.firstName);
-            expect(message.payload.name).toBe(payload2.name);
-            aPipe.remove(message, (err: any, result: any) => {
-                if (err) {
-                    fail("Couldn't delete message due to: " + err)
+            expect(message).toBeDefined()
+            if (message) {
+                expect(message.payload).toBeDefined()
+                if (message.payload) {
+                    expect(message.payload.firstName).toBe(payload2.firstName)
+                    expect(message.payload.name).toBe(payload2.name)
+                    aPipe.remove(message, (err: any, result: any) => {
+                        if (err) {
+                            fail("Couldn't delete message due to: " + err)
+                        }
+                        done()
+                    })
                 }
-                done();
-            });
-        });
-    });
+            }
+        })
+    })
+
     it("should be possible to destroy the now empty pipe", (done) => {
         aPipe.destroy((err: any) => {
             if (err) {
