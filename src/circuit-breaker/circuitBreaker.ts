@@ -49,13 +49,14 @@ export class CircuitBreaker {
         logger.debug("CircuitBreaker(%s).execute(): start", this.name)
         if (!this.isClosed()) {
             logger.info("CircuitBreaker(%s).execute(): Circuit is open. Calling error handler.", this.name)
-            errorHandler(new Error("CircuitBreaker.execute(): call within the retry period."))
+            errorHandler(new Error("CircuitBreaker.execute(): Call within the retry period."))
         }
         else {
             this.serviceCall((err: Error) => {
                 this.failureCount++
                 this.lastErrorTimestamp = Date.now()
-                logger.error("CircuitBreaker(%s).execute(): Service not available due to '%s' incrementing failure count to %s/%s.", this.name, err, this.failureCount, this.failureThreshold)
+                logger.error("CircuitBreaker(%s).execute(): Service not available due to '%s' incrementing failure count to %s/%s.",
+                             this.name, err, this.failureCount, this.failureThreshold)
                 errorHandler(err)
             }, (result: any) => {
                 this.lastErrorTimestamp = undefined
@@ -69,12 +70,8 @@ export class CircuitBreaker {
      * Checks, if the cicuit is closed or open. Only if the cicuit is closed, the call to the service will be executed.
      */
     public isClosed(): boolean {
-        if (!this.lastErrorTimestamp) {
-            return true
-        }
-        if (Date.now() > this.lastErrorTimestamp + this.retry) {
-            return true
-        }
-        return this.failureCount < this.failureThreshold
+        return !this.lastErrorTimestamp
+            || Date.now() > this.lastErrorTimestamp + this.retry
+            || this.failureCount < this.failureThreshold
     }
 }
