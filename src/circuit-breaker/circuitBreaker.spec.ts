@@ -12,15 +12,19 @@ describe("The circuit breaker should", () => {
         }
     }
 
+    function expectServiceCallSuccess(aCB: CircuitBreaker, n = 100) {
+        for (let i = 0; i < n; i++) {
+            aCB.execute((err: Error) => {fail()}, (result: any) => {})
+            expect(aCB.isClosed()).toBe(true)
+        }
+
+    }
+
     it("work transparent as long as no error occurs.", () => {
         let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", serviceCall, 100)
         triggerError = false
         expect(aCB.isClosed()).toBe(true)
-
-        for (let i = 0; i < 10; i++) {
-            aCB.execute((err: Error) => {fail()}, (result: any) => {})
-            expect(aCB.isClosed()).toBe(true)
-        }
+        expectServiceCallSuccess(aCB)
     })
 
     it("stays in error state for some time.", () => {
@@ -56,8 +60,7 @@ describe("The circuit breaker should", () => {
             // !!! Pleaes be aware, that this is only working, if it is the last test!
             expect(aCB.isClosed()).toBe(true)
             triggerError = false // This is not really multitasking!
-            aCB.execute((err: Error) => {fail()}, (result: any) => {})
-            expect(aCB.isClosed()).toBe(true)
+            expectServiceCallSuccess(aCB)
             done()
         }, 60)
     })
