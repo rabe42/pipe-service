@@ -16,8 +16,11 @@ describe("The circuit breaker should", () => {
         let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", serviceCall, 100)
         triggerError = false
         expect(aCB.isClosed()).toBe(true)
-        aCB.execute((err: Error) => {fail()}, (result: any) => {})
-        expect(aCB.isClosed()).toBe(true)
+
+        for (let i = 0; i < 10; i++) {
+            aCB.execute((err: Error) => {fail()}, (result: any) => {})
+            expect(aCB.isClosed()).toBe(true)
+        }
     })
 
     it("stays in error state for some time.", () => {
