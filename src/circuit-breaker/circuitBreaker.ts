@@ -53,14 +53,10 @@ export class CircuitBreaker {
         }
         else {
             this.serviceCall((err: Error) => {
-                this.failureCount++
-                this.lastErrorTimestamp = Date.now()
-                logger.error("CircuitBreaker(%s).execute(): Service not available due to '%s' incrementing failure count to %s/%s.",
-                             this.name, err, this.failureCount, this.failureThreshold)
+                this.recordFailure(err)
                 errorHandler(err)
             }, (result: any) => {
-                this.lastErrorTimestamp = undefined
-                this.failureCount = 0
+                this.reset()
                 successHandler(result)
             })
         }
@@ -73,5 +69,24 @@ export class CircuitBreaker {
         return !this.lastErrorTimestamp
             || Date.now() > this.lastErrorTimestamp + this.retry
             || this.failureCount < this.failureThreshold
+    }
+
+    /**
+     * Loggs the failure and make sure that the failure counts.
+     * @param err The error which causes the problem.
+     */
+    private recordFailure(err: Error): void {
+                this.failureCount++
+                this.lastErrorTimestamp = Date.now()
+                logger.error("CircuitBreaker(%s).execute(): Service not available due to '%s' incrementing failure count to %s/%s.",
+                             this.name, err, this.failureCount, this.failureThreshold)
+    }
+
+    /**
+     * Brings it back to the open state.
+     */
+    private reset(): void {
+        this.lastErrorTimestamp = undefined
+        this.failureCount = 0
     }
 }
