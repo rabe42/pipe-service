@@ -48,7 +48,7 @@ export class CircuitBreaker {
     public execute(errorHandler: EH, successHandler: SH) {
         logger.debug("CircuitBreaker(%s).execute(): start", this.name)
         if (!this.isClosed()) {
-            logger.info("CircuitBreaker(%s).execute(): Circuit is open. Calling error handler.", this.name)
+            logger.warn("CircuitBreaker(%s).execute(): Circuit is open. Calling error handler.", this.name)
             errorHandler(new Error("CircuitBreaker.execute(): Call within the retry period."))
         }
         else {
@@ -76,16 +76,19 @@ export class CircuitBreaker {
      * @param err The error which causes the problem.
      */
     private recordFailure(err: Error): void {
-                this.failureCount++
-                this.lastErrorTimestamp = Date.now()
-                logger.error("CircuitBreaker(%s).execute(): Service not available due to '%s' incrementing failure count to %s/%s.",
-                             this.name, err, this.failureCount, this.failureThreshold)
+        this.failureCount++
+        this.lastErrorTimestamp = Date.now()
+        logger.error("CircuitBreaker(%s).execute(): Service not available due to '%s' incrementing failure count to %s/%s.",
+                        this.name, err, this.failureCount, this.failureThreshold)
     }
 
     /**
      * Brings it back to the open state.
      */
     private reset(): void {
+        if (this.failureCount != 0) {
+            logger.info("CircuitBreaker(%s).reset(): Back to normal.", this.name)
+        }
         this.lastErrorTimestamp = undefined
         this.failureCount = 0
     }
