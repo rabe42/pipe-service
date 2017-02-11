@@ -59,6 +59,7 @@ export class FileEndPoint {
         this.timer = setInterval((fileEndPoint: FileEndPoint) => {
             fileEndPoint.serve()
         }, this.interval, this)
+        this.timer.unref()
     }
 
     /**

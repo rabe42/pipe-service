@@ -74,12 +74,13 @@ describe("A file end point", () => {
     })
 
     it ("should close the without data end point.", (done) => {
-        setTimeout(() => {
+        let timer = setTimeout(() => {
             if (fepUnderTest != undefined && fepUnderTest != null) {
                 fepUnderTest.close()
             }
             done()
         }, 500)
+        timer.unref()
     })
 
     it("should fill the pipe.", (done) => {
@@ -91,9 +92,10 @@ describe("A file end point", () => {
         expect(fepUnderTest.pattern).toBe("test_{_id}.json")
         fepUnderTest.start()
         // Wait for some seconds to allow the consumption of the pipe content.
-        setTimeout(() => {
+        let timer = setTimeout(() => {
             done()
         }, 1000)
+        timer.unref()
     })
 
     it("... and put it to the given location.", () => {
@@ -102,11 +104,12 @@ describe("A file end point", () => {
     })
 
     it("should close the end point after data are read from the pipe.", (done) => {
-        setTimeout(() => {
+        let timer = setTimeout(() => {
             if (fepUnderTest != undefined && fepUnderTest != null) {
                 fepUnderTest.close()
             }
             done()
         }, 500)
+        timer.unref()
     })
 })
