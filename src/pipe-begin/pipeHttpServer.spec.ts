@@ -105,10 +105,11 @@ describe("The pipe http server", () => {
     });
     it("should terminate the server.", (done) => {
         logger.debug("pipeHttpServer.spec: 7");
-        setTimeout(() => {
+        let timer = setTimeout(() => {
             pipeServer1.close();
             done();
         }, 500);
+        timer.unref()
         logger.debug("pipeHttpServer.spec: 7 end");
     });
     it("should destroy the pipe.", (done) => {
