@@ -43,10 +43,11 @@ describe("The circuit breaker should", () => {
         triggerError = true
         aCB.execute((err: Error) => {}, (result: any) => {fail()})
         expect(aCB.isClosed()).toBe(false)
-        setTimeout(() => {
+        let timer = setTimeout(() => {
             expect(aCB.isClosed()).toBe(true)
             done()
         }, 60)
+        timer.unref()
     })
 
     it("get back to life and stays there.", (done) => {
@@ -56,12 +57,13 @@ describe("The circuit breaker should", () => {
         expect(aCB.isClosed()).toBe(true)
         aCB.execute((err: Error) => {}, (result: any) => {fail()})
         expect(aCB.isClosed()).toBe(false)
-        setTimeout(() => {
+        let timer = setTimeout(() => {
             // !!! Pleaes be aware, that this is only working, if it is the last test!
             expect(aCB.isClosed()).toBe(true)
             triggerError = false // This is not really multitasking!
             expectServiceCallSuccess(aCB)
             done()
         }, 60)
+        timer.unref()
     })
 })
