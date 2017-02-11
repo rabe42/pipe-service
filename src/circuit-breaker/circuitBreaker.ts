@@ -78,8 +78,14 @@ export class CircuitBreaker {
     private recordFailure(err: Error): void {
         this.failureCount++
         this.lastErrorTimestamp = Date.now()
-        logger.error("CircuitBreaker(%s).execute(): Service not available due to '%s' incrementing failure count to %s/%s.",
-                        this.name, err, this.failureCount, this.failureThreshold)
+        if (this.isClosed()) {
+            logger.warn("CircuitBreaker(%s).execute(): Service not available due to '%s' incrementing failure count to %s/%s.",
+                            this.name, err, this.failureCount, this.failureThreshold)
+        }
+        else {
+            logger.error("CircuitBreaker(%s).execute(): Service not available due to '%s' incrementing failure count to %s/%s.",
+                            this.name, err, this.failureCount, this.failureThreshold)
+        }
     }
 
     /**
