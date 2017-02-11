@@ -11,12 +11,13 @@ describe("A asynchronous http service", () => {
     let server1: http.Server = http.createServer((request: http.IncomingMessage, response: http.ServerResponse) => {
         logger.debug("asyncHttp.spec.server1.createServer.callback(%s): processing request.", request.url);
         server1Request = request;
-        setTimeout(() => {
+        let timer = setTimeout(() => {
             logger.debug("asyncHttp.spec.server1.createServer.callback(%s): timeout begin.", request.url);
             response.statusCode = 200;
             response.end("Ok1");
             logger.debug("asyncHttp.spec.server1.createServer.callback(%s): timeout end.", request.url);
         }, 600);
+        timer.unref()
         logger.debug("asyncHttp.spec.server1.createServer.callback(%s): processing request end.", request.url);
     });
     server1.listen(9091, "localhost");
