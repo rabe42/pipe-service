@@ -227,15 +227,17 @@ describe("The pipe interface:", () => {
         // I've to make sure, that the initialization is done once, before I destroy the database again.
         aNewPipe = new Pipe("aNewPipe", ["a.b.c"]);
         aNewPipe.init(done);
-    });
-    it ("should be possible to call all functions also without callback", (done) => {
-        aNewPipe.init();
-        aNewPipe.push("Hello");
-        aNewPipe.peek();
-        aNewPipe.remove({_id: "1", _rev: "1"});
-        aNewPipe.destroy();
-        setTimeout(done, 500);
-    });
+    })
+
+    it ("should be possible to call all functions also without callback", (done: () => void) => {
+        aNewPipe.init()
+        aNewPipe.push("Hello")
+        aNewPipe.peek()
+        aNewPipe.remove({_id: "1", _rev: "1"})
+        aNewPipe.destroy()
+        setTimeout(done, 500).unref()
+    })
+
     it ("should be possible to force to destroy the pipe", (done) => {
         aNewPipe.destroy((err, res) => {
             // Ignore the error in this case, as the destroy of the previous call might have worked, as the database was empty.
