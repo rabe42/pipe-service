@@ -21,7 +21,7 @@ let errorStream = {
 }
 
 let fileStream = {
-    level: 'debug',
+    level: 'info',
     path: 'file.log.json'
 }
 
@@ -47,4 +47,16 @@ export let fileLoggerConfig: bunyan.LoggerOptions = {
     name: "FileLogger",
     level: 'info',
     streams: [commonStream, fileStream]
+}
+
+export let pipePullHttpClient: bunyan.LoggerOptions = {
+    name: "HttpClient",
+    level: 'debug',
+    streams: [commonStream, errorStream]
+}
+
+export let circuitBreaker: bunyan.LoggerOptions = {
+    name: "CircuitBreaker",
+    level: 'info',
+    streams: [commonStream, errorStream]
 }

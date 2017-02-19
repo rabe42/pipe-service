@@ -11,6 +11,10 @@ let logger = bunyan.createLogger(circuitBreaker)
 export type SH = (result: any) => void
 export type EH = (error: Error) => void
 
+interface ServiceCall {
+    callService(errorHandler: EH, successHandler: SH): void
+}
+
 /**
  * The circuit breaker is intended for the operation of connections to a service. 
  * If the service fails to deliver for some time (failuserThreshold), the connections will only 
