@@ -1,7 +1,7 @@
 import * as bunyan from "bunyan"
 import * as http from "http";
 
-import {Pipe} from "../pipes/Pipe"
+import {Pipe} from "../pipes/pipe"
 import {pipePullHttpClient} from "../loggerConfig"
 import {CircuitBreaker, ServiceCall, EH, SH} from '../circuit-breaker/circuitBreaker'
 
@@ -54,7 +54,7 @@ export class PipePullHttpClient {
     public start(errorHandler: (err: Error) => void, success: (payload: any) => void) {
         logger.debug("PipePullHttpClient.start()")
         // Creates an CircuitBreaker
-        this.circuitBreaker = new CircuitBreaker(this.getRequest)
+        //this.circuitBreaker = new CircuitBreaker(this.getRequest)
         // Schedule the calls.
         this.theInterval = setInterval((self) => {
             // FIXME: We have to make sure, that this runs only once at a time! (Check on member variable isn't save enough as it is not atomic.)

@@ -38,7 +38,7 @@ describe("The circuit breaker should", () => {
         expect(aCB.isClosed()).toBe(false)
     })
 
-    it("get back to life after the time is over.", (done) => {
+    it("get back to life after the time is over.", (done: ()=>void) => {
         let aCB = new CircuitBreaker("CircuitBreaker Unit-Test", serviceCall, 50)
         triggerError = true
         aCB.execute((err: Error) => {}, (result: any) => {fail()})
@@ -50,7 +50,7 @@ describe("The circuit breaker should", () => {
         timer.unref()
     })
 
-    it("get back to life and stays there.", (done) => {
+    it("get back to life and stays there.", (done: ()=>void) => {
         let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", serviceCall, 50, 2)
         triggerError = true
         aCB.execute((err: Error) => {}, (result: any) => {fail()})

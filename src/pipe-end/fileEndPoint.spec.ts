@@ -21,7 +21,7 @@ describe("A file end point", () => {
         (err) => {return done()})
     }
 
-    afterAll((done) => {
+    afterAll((done: ()=>void) => {
         // TODO Delete directory
         let files = fs.readdirSync(fepData)
         files.forEach((file) => { 
@@ -30,7 +30,7 @@ describe("A file end point", () => {
         pipe.destroy(done, true)
     })
 
-    it("should initialize the pipe", (done) => {
+    it("should initialize the pipe", (done: ()=>void) => {
             pipe.init(done)
     })
 
@@ -73,7 +73,7 @@ describe("A file end point", () => {
         expect(fnList.length).toBe(0)
     })
 
-    it ("should close the without data end point.", (done) => {
+    it ("should close the without data end point.", (done: ()=>void) => {
         let timer = setTimeout(() => {
             if (fepUnderTest != undefined && fepUnderTest != null) {
                 fepUnderTest.close()
@@ -83,11 +83,11 @@ describe("A file end point", () => {
         timer.unref()
     })
 
-    it("should fill the pipe.", (done) => {
+    it("should fill the pipe.", (done: ()=>void) => {
         fillPipe(done)
     })
 
-    it("should read the content of the pipe...", (done) => {
+    it("should read the content of the pipe...", (done: ()=>void) => {
         fepUnderTest = new FileEndPoint(pipe, fepData, "test_{_id}.json")
         expect(fepUnderTest.pattern).toBe("test_{_id}.json")
         fepUnderTest.start()
@@ -103,7 +103,7 @@ describe("A file end point", () => {
         expect(fnList.length).toBe(3)
     })
 
-    it("should close the end point after data are read from the pipe.", (done) => {
+    it("should close the end point after data are read from the pipe.", (done: ()=>void) => {
         let timer = setTimeout(() => {
             if (fepUnderTest != undefined && fepUnderTest != null) {
                 fepUnderTest.close()

@@ -11,7 +11,7 @@ let logger = bunyan.createLogger(circuitBreaker)
 export type SH = (result: any) => void
 export type EH = (error: Error) => void
 
-interface ServiceCall {
+export interface ServiceCall {
     callService(errorHandler: EH, successHandler: SH): void
 }
 

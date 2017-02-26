@@ -1,8 +1,8 @@
 import * as http from "http"; 
 import * as async from "async";
 
-import {PipePullHttpClient} from "./PipePullHttpClient"
-import {Pipe} from "../pipes/Pipe"
+import {PipePullHttpClient} from "./pipePullHttpClient"
+import {Pipe} from "../pipes/pipe"
 
 describe("The http pull client should", () => {
 
@@ -32,7 +32,7 @@ describe("The http pull client should", () => {
         catch (err) {}
     })
 
-    it("retrieve data from a hub.", (done) => {
+    it("retrieve data from a hub.", (done: ()=>void) => {
         createService(done)
         let pullClient = new PipePullHttpClient(new Pipe("test"))
         pullClient.start((err) => {
