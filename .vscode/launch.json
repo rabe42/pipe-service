@@ -46,7 +46,7 @@
             "name": "Testen",
             "type": "node",
             "request": "launch",
-            "program": "/Users/rberger/.npm-packages/bin/gulp",
+            "program": "${workspaceRoot}/node_modules/gulp-cli/bin/gulp.js",
             "stopOnEntry": false,
             "args": ["test"],
             "cwd": "${workspaceRoot}",
