@@ -54,10 +54,10 @@ export class PipePullHttpClient {
     public start(errorHandler: (err: Error) => void, success: (payload: any) => void) {
         logger.debug("PipePullHttpClient.start()")
         // Creates an CircuitBreaker
-        //this.circuitBreaker = new CircuitBreaker(this.getRequest)
+        this.circuitBreaker = new CircuitBreaker("PipePullHttpClient", this.getRequest, 1000)
         // Schedule the calls.
         this.theInterval = setInterval((self) => {
-            // FIXME: We have to make sure, that this runs only once at a time! (Check on member variable isn't save enough as it is not atomic.)
+            // NOTE: As we have no concurrent execution, but an event loop, this approach is save!
             if (!self.requestRunning) {
                 self.requestRunning = true
                 logger.info('PipePullHttpClient.start(): called in interval.')

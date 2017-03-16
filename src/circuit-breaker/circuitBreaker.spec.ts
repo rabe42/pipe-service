@@ -1,5 +1,17 @@
 import {CircuitBreaker, EH, SH} from "./circuitBreaker"
 
+class ServCaller {
+    triggerError = false
+    public serviceCall(errorHandler: EH, successHandler: SH) {
+        if (this.triggerError) {
+            errorHandler(new Error("ServCaller.serviceCall(): Husten..."))
+        }
+        else {
+            successHandler(null)
+        }
+    }
+}
+
 describe("The circuit breaker should", () => {
     let triggerError = false
 
@@ -17,7 +29,6 @@ describe("The circuit breaker should", () => {
             aCB.execute((err: Error) => {fail()}, (result: any) => {})
             expect(aCB.isClosed()).toBe(true)
         }
-
     }
 
     it("work transparent as long as no error occurs.", () => {
@@ -51,7 +62,7 @@ describe("The circuit breaker should", () => {
     })
 
     it("get back to life and stays there.", (done: ()=>void) => {
-        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", serviceCall, 50, 2)
+        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", serviceCall, 50, undefined, 2)
         triggerError = true
         aCB.execute((err: Error) => {}, (result: any) => {fail()})
         expect(aCB.isClosed()).toBe(true)
@@ -65,5 +76,11 @@ describe("The circuit breaker should", () => {
             done()
         }, 60)
         timer.unref()
+    })
+
+    it("also work with a context.", () => {
+        let aSC = new ServCaller()
+        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test with context", aSC.serviceCall, 50, aSC, 2)
+        aCB.execute((err: Error) => {fail()}, (result: any) => {})
     })
 })

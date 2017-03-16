@@ -27,6 +27,7 @@ export class CircuitBreaker {
     private failureCount: number
     private serviceCall: (errorHandler: EH, successHandler: SH) => void
     private lastErrorTimestamp: number
+    private context: any
 
     /**
      * Creates a cicuit breaker for the given service call.
@@ -35,9 +36,10 @@ export class CircuitBreaker {
      * @param retryInMillis The time which must elapse before the opened circuit is closed again.
      * @param failureThreshold The number of failures the breaker tollerates before it openes the circuit.
      */
-    constructor(name: string, serviceCall: (errorHandler: EH, successHandler: SH) => void, retryInMillis: number, failureThreshold = 1) {
+    constructor(name: string, serviceCall: (errorHandler: EH, successHandler: SH) => void, retryInMillis: number, context: any = undefined, failureThreshold = 1) {
         this.name = name
         this.serviceCall = serviceCall
+        this.context = context
         this.retry = retryInMillis
         this.failureThreshold = failureThreshold
         this.failureCount = 0
@@ -56,7 +58,11 @@ export class CircuitBreaker {
             errorHandler(new Error("CircuitBreaker.execute(): Call within the retry period."))
         }
         else {
-            this.serviceCall((err: Error) => {
+            let serviceCall = this.serviceCall
+            if (this.context) {
+                serviceCall = this.context.serviceCall
+            }
+            serviceCall((err: Error) => {
                 this.recordFailure(err)
                 errorHandler(err)
             }, (result: any) => {
