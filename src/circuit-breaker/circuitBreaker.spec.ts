@@ -1,8 +1,8 @@
-import {CircuitBreaker, EH, SH} from "./circuitBreaker"
+import {CircuitBreaker, ServiceCall, EH, SH} from "./circuitBreaker"
 
-class ServCaller {
+class ServCaller implements ServiceCall {
     triggerError = false
-    public serviceCall(errorHandler: EH, successHandler: SH) {
+    public callService(errorHandler: EH, successHandler: SH) {
         if (this.triggerError) {
             errorHandler(new Error("ServCaller.serviceCall(): Husten..."))
         }
@@ -80,7 +80,7 @@ describe("The circuit breaker should", () => {
 
     it("also work with a context.", () => {
         let aSC = new ServCaller()
-        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test with context", aSC.serviceCall, 50, aSC, 2)
+        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test with context", undefined, 50, aSC, 2)
         aCB.execute((err: Error) => {fail()}, (result: any) => {})
     })
 })
