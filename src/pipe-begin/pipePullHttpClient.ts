@@ -19,7 +19,7 @@ function processRequest(theRequest: any, theClient: PipePullHttpClient) {
  * This needs a circuit breaker to database and to the communication hub. As 
  * both may be unavailable for a certain time.
  */
-export class PipePullHttpClient {
+export class PipePullHttpClient implements ServiceCall {
     pipe: Pipe
     hubHostname: string         // The name of the host, which delivers the messages
     hubPortNo: number           // The port number, where the data will be provided.
@@ -33,12 +33,20 @@ export class PipePullHttpClient {
     // Connection request timeout
     // Connection frequency
     
-    constructor(pipe: Pipe, hubHostname = "localhost", hubPortNo = 6513, timeout = 1000, retryInterval = 600) {
+    /**
+     * Creates a pull client, which will fetch the data from the given hub.
+     * @param pipe The pipe where the message will go into.
+     * @param hubHostname The hostname of the hub.
+     * @param hubPortNo The port number of the hub.
+     * @param timeout The timeout (how long do we wait)
+     * @param retryInterval The interval where we do the retry.
+     */
+    constructor(pipe: Pipe, hubHostname = "localhost", hubPortNo = 6513, timeout = 1000, retryInterval = 600, errorHandler: EH = undefined, successHandler: SH = undefined) {
         if (!pipe) {
             throw new Error("No pipe provided!")
         }
         this.pipe = pipe
-        this.setHubHostname(hubHostname)
+        this.setHubHostname(hubHostname, errorHandler, successHandler)
         this.setHubPort(hubPortNo)
         this.hubPortNo = hubPortNo
         this.timeout = timeout
@@ -54,7 +62,8 @@ export class PipePullHttpClient {
     public start(errorHandler: (err: Error) => void, success: (payload: any) => void) {
         logger.debug("PipePullHttpClient.start()")
         // Creates an CircuitBreaker
-        this.circuitBreaker = new CircuitBreaker("PipePullHttpClient", this.getRequest, 1000)
+        this.circuitBreaker = new CircuitBreaker("PipePullHttpClient", 1000)
+        this.circuitBreaker.setCall(this)
         // Schedule the calls.
         this.theInterval = setInterval((self) => {
             // NOTE: As we have no concurrent execution, but an event loop, this approach is save!
@@ -73,12 +82,29 @@ export class PipePullHttpClient {
         this.theInterval.unref()
     }
 
+    /**
+     * Stopps furture pull requests.
+     */
     public stop() {
         logger.info("PipePullHttpClient.stop(): Client stopped.")
         clearInterval(this.theInterval)
     }
 
-    private getRequest(errorHandler: (err: Error) => void, success: (payload: any) => void) {
+    /**
+     * The interface for use by the circuite breaker.
+     * @param errorHandler Callback for errors.
+     * @param successHandler Callback with the result in case of success.
+     */
+    public callService(errorHandler: EH, successHandler: SH) {
+        this.getRequest(errorHandler, successHandler)
+    }
+
+    /**
+     * Pull call to the HUB.
+     * @param errorHandler Callback for errors.
+     * @param success Callback with the result in case of success.
+     */
+    private getRequest(errorHandler: EH, success: SH) {
         logger.info("PipePullHttpClient.getRequest(%s): Start get request...", this.pipe)
         let serverResponse: string
 
@@ -104,11 +130,22 @@ export class PipePullHttpClient {
             })
     }
 
-    private setHubHostname(hubHostname: string) {
+    /**
+     * Set the hostname, if the host is reachable.
+     * 
+     * @param hubHostname The host name of the hub.
+     * @param errorHandler Called, if the hostname isn't reachable.
+     * @param successHandler Called, if the host was reachable.
+     */
+    private setHubHostname(hubHostname: string, errorHandler: EH, successHandler: SH) {
         if (!hubHostname) {
             throw new Error("A valid hostname must be provided.")
         }
+        // TODO: Check, if the host is reachable.
         this.hubHostname = hubHostname
+        if (successHandler) {
+            successHandler(true)
+        }
     }
 
     private setHubPort(hubPortNo: number) {
