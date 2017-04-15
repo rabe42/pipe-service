@@ -15,6 +15,8 @@ export interface ServiceCall {
     callService(errorHandler: EH, successHandler: SH): void
 }
 
+export type ServiceCallFunction = (errorHandler: EH, successHandler: SH) => void
+
 /**
  * The circuit breaker is intended for the operation of connections to a service. 
  * If the service fails to deliver for some time (failuserThreshold), the connections will only 
@@ -25,9 +27,9 @@ export class CircuitBreaker {
     private retry: number
     private failureThreshold: number
     private failureCount: number
-    private serviceCall: (errorHandler: EH, successHandler: SH) => void
+    private serviceCallFunction: ServiceCallFunction
+    private serviceCall: ServiceCall
     private lastErrorTimestamp: number
-    private context: any
 
     /**
      * Creates a cicuit breaker for the given service call.
@@ -36,14 +38,20 @@ export class CircuitBreaker {
      * @param retryInMillis The time which must elapse before the opened circuit is closed again.
      * @param failureThreshold The number of failures the breaker tollerates before it openes the circuit.
      */
-    constructor(name: string, serviceCall: (errorHandler: EH, successHandler: SH) => void, retryInMillis: number, context: ServiceCall = undefined, failureThreshold = 1) {
+    constructor(name: string, retryInMillis: number, failureThreshold = 1) {
         this.name = name
-        this.serviceCall = serviceCall
-        this.context = context
         this.retry = retryInMillis
         this.failureThreshold = failureThreshold
         this.failureCount = 0
         this.lastErrorTimestamp = undefined
+    }
+
+    public setCallFunction(serviceCallFunction: ServiceCallFunction) {
+        this.serviceCallFunction = serviceCallFunction
+    }
+
+    public setCall(serviceCall: ServiceCall) {
+        this.serviceCall = serviceCall
     }
 
     /**
@@ -58,9 +66,17 @@ export class CircuitBreaker {
             errorHandler(new Error("CircuitBreaker.execute(): Call within the retry period."))
         }
         else {
-            if (this.context) {
-                //serviceCall = this.context.serviceCall
-                this.context.callService((err: Error) => {
+            if (this.serviceCall) {
+                this.serviceCall.callService((err: Error) => {
+                    this.recordFailure(err)
+                    errorHandler(err)
+                }, (result: any) => {
+                    this.reset()
+                    successHandler(result)
+                })
+            }
+            else if (this.serviceCallFunction) {
+                this.serviceCallFunction((err: Error) => {
                     this.recordFailure(err)
                     errorHandler(err)
                 }, (result: any) => {
@@ -69,13 +85,9 @@ export class CircuitBreaker {
                 })
             }
             else {
-                this.serviceCall((err: Error) => {
-                    this.recordFailure(err)
-                    errorHandler(err)
-                }, (result: any) => {
-                    this.reset()
-                    successHandler(result)
-                })
+                let message = "CircuitBreaker.execute(): No service call defined!"
+                logger.error(message)
+                errorHandler(new Error(message))
             }
         }
     }

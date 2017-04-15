@@ -32,14 +32,16 @@ describe("The circuit breaker should", () => {
     }
 
     it("work transparent as long as no error occurs.", () => {
-        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", serviceCall, 100)
+        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", 100)
+        aCB.setCallFunction(serviceCall)
         triggerError = false
         expect(aCB.isClosed()).toBe(true)
         expectServiceCallSuccess(aCB)
     })
 
     it("stays in error state for some time.", () => {
-        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", serviceCall, 100)
+        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", 100)
+        aCB.setCallFunction(serviceCall)
         triggerError = true
         expect(aCB.isClosed()).toBe(true)
         aCB.execute((err: Error) => {}, (result: any) => {fail()})
@@ -50,7 +52,8 @@ describe("The circuit breaker should", () => {
     })
 
     it("get back to life after the time is over.", (done: ()=>void) => {
-        let aCB = new CircuitBreaker("CircuitBreaker Unit-Test", serviceCall, 50)
+        let aCB = new CircuitBreaker("CircuitBreaker Unit-Test", 50)
+        aCB.setCallFunction(serviceCall)
         triggerError = true
         aCB.execute((err: Error) => {}, (result: any) => {fail()})
         expect(aCB.isClosed()).toBe(false)
@@ -62,7 +65,8 @@ describe("The circuit breaker should", () => {
     })
 
     it("get back to life and stays there.", (done: ()=>void) => {
-        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", serviceCall, 50, undefined, 2)
+        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test", 50, 2)
+        aCB.setCallFunction(serviceCall)
         triggerError = true
         aCB.execute((err: Error) => {}, (result: any) => {fail()})
         expect(aCB.isClosed()).toBe(true)
@@ -80,7 +84,8 @@ describe("The circuit breaker should", () => {
 
     it("also work with a context.", () => {
         let aSC = new ServCaller()
-        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test with context", undefined, 50, aSC, 2)
+        let aCB = new CircuitBreaker("CicuitBreaker Unit-Test with context", 50, 2)
+        aCB.setCall(aSC)
         aCB.execute((err: Error) => {fail()}, (result: any) => {})
     })
 })
