@@ -24,12 +24,13 @@ describe("The http pull client should", () => {
         catch (err) {}
     })
 
-    it("not be created without a hostname.", () => {
-        try {
-            new PipePullHttpClient(new Pipe("test"), "")
+    it("not be created without a hostname.", (done: ()=>void) => {
+        new PipePullHttpClient(new Pipe("test"), "", 6513, 1000, 1000, (error: Error) => {
+            done()
+        }, () => {
             fail()
-        }
-        catch (err) {}
+            done()
+        })
     })
 
     it("retrieve data from a hub.", (done: ()=>void) => {

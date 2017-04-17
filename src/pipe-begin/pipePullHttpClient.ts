@@ -46,9 +46,7 @@ export class PipePullHttpClient implements ServiceCall {
             throw new Error("No pipe provided!")
         }
         this.pipe = pipe
-        this.setHubHostname(hubHostname, errorHandler, successHandler)
-        this.setHubPort(hubPortNo)
-        this.hubPortNo = hubPortNo
+        this.setHub(hubHostname, hubPortNo, errorHandler, successHandler)
         this.timeout = timeout
         this.retryInterval = retryInterval
     }
@@ -137,21 +135,24 @@ export class PipePullHttpClient implements ServiceCall {
      * @param errorHandler Called, if the hostname isn't reachable.
      * @param successHandler Called, if the host was reachable.
      */
-    private setHubHostname(hubHostname: string, errorHandler: EH, successHandler: SH) {
+    private setHub(hubHostname: string, hubPort: number, errorHandler: EH, successHandler: SH) {
         if (!hubHostname) {
-            throw new Error("A valid hostname must be provided.")
+            if (errorHandler) {
+                setImmediate(errorHandler, new Error("A valid hostname must be provided."))
+            }
+            return
+        }
+        if (!hubPort) {
+            if (errorHandler) {
+                setImmediate(errorHandler, new Error("A valid port number must be provided."))
+            }
+            return
         }
         // TODO: Check, if the host is reachable.
         this.hubHostname = hubHostname
+        this.hubPortNo = hubPort
         if (successHandler) {
             setImmediate(successHandler, true)
         }
-    }
-
-    private setHubPort(hubPortNo: number) {
-        if (!hubPortNo) {
-            throw new Error("A valid port number must be provided.")
-        }
-        this.hubPortNo = hubPortNo
     }
 }
