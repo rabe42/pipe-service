@@ -144,7 +144,7 @@ export class PipePullHttpClient implements ServiceCall {
         // TODO: Check, if the host is reachable.
         this.hubHostname = hubHostname
         if (successHandler) {
-            successHandler(true)
+            setImmediate(successHandler, true)
         }
     }
 
