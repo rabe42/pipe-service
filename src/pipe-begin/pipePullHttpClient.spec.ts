@@ -9,6 +9,7 @@ describe("The http pull client should", () => {
     let testResponse = {_id: 123456789, name: "testResponse", payload: {name: "payload", value: "A value"}}
 
     // Start a services which provides a simple message answer.
+    // TODO: Müsste dieser Service nicht auf 6513 lauschen?
     function createService(cb: ()=>void) {
         let service = http.createServer((request, response) => {
             response.end(JSON.stringify(testResponse))
@@ -34,8 +35,9 @@ describe("The http pull client should", () => {
     })
 
     it("retrieve data from a hub.", (done: ()=>void) => {
-        createService(done)
+        // TODO: Shouldn't this use async?
         let pullClient = new PipePullHttpClient(new Pipe("test"))
+        createService(done)
         pullClient.start((err) => {
             // Should be notified, if sth. failed.
             pullClient.stop()
@@ -49,5 +51,32 @@ describe("The http pull client should", () => {
     })
 
     // TODO: Check, if the client pulls some data and stores it!
+    it ("should store received data into the pipe.", (done: ()=>void) => {
+        let pullClient = new PipePullHttpClient(new Pipe("test"))
+        async.series([
+            (callback) => {
+                createService(callback)
+            },
+            (callback) => {
+                // start to retrieve the data
+                pullClient.start(
+                    (err) => {
+                        callback(err)
+                    }, 
+                    (result) => {
+                        callback(undefined, true)
+                })
+            },
+            (callback) => {
+                // Check if the pipe has an entry.
+            }
+        ], (err, result) => {
+            if (err) {
+                fail(err)
+            }
+            done()
+        })
+    })
+
     // TODO: Check, if the client can get to proper operation again, after the communication failed.
 })

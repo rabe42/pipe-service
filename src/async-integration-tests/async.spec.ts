@@ -21,7 +21,7 @@ describe("The async lib", () => {
         expect(dbConnection).toBeDefined();
     });
 
-    it("should call the final callback after a parallel function comes back.", (done) => {
+    it("should call the final callback after a parallel function comes back.", (done: ()=>void) => {
         var finalCallbackCalled = false;
         var dbCreated = false;
         async.series([
@@ -46,7 +46,7 @@ describe("The async lib", () => {
         });
     });
 
-    it("should delete the database again", (done) => {
+    it("should delete the database again", (done: ()=>void) => {
         dbConnection.destroy(() => { done() });
     });
 });
