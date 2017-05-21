@@ -9,12 +9,17 @@ describe("The http pull client should", () => {
     let testResponse = {_id: 123456789, name: "testResponse", payload: {name: "payload", value: "A value"}}
 
     // Start a services which provides a simple message answer.
-    // TODO: Müsste dieser Service nicht auf 6513 lauschen?
+    // FIXME: Müsste dieser Service nicht auf 6513 lauschen?
+    // FIXME: Müsste dieser Service nicht auch beendet werden?
     function createService(cb: ()=>void) {
         let service = http.createServer((request, response) => {
             response.end(JSON.stringify(testResponse))
         })
         service.listen(9191, "localhost", cb)
+    }
+
+    function stopService(cb: ()=>void) {
+
     }
 
     it("not be created without a pipe.", () => {
@@ -35,22 +40,27 @@ describe("The http pull client should", () => {
     })
 
     it("retrieve data from a hub.", (done: ()=>void) => {
-        // TODO: Shouldn't this use async?
         let pullClient = new PipePullHttpClient(new Pipe("test"))
-        createService(done)
-        pullClient.start((err) => {
-            // Should be notified, if sth. failed.
-            pullClient.stop()
-            done()
-        }, (payload) => {
-            // Should be notified, if everything is fine. --> fail()
-            pullClient.stop()
-            fail()
+        async.series([
+            (callback) => {
+                createService(callback)
+            },
+            (callback) => {
+                pullClient.start((err) => {
+                    pullClient.stop()
+                    callback(null, true)
+                }, (payload) => {
+                    callback(new Error("Claims everything Ok!"), false)
+                })
+            }
+        ], (err, result) => {
+            if (err) {
+                fail(err)
+            }
             done()
         })
     })
 
-    // TODO: Check, if the client pulls some data and stores it!
     it ("should store received data into the pipe.", (done: ()=>void) => {
         let pullClient = new PipePullHttpClient(new Pipe("test"))
         async.series([
@@ -64,11 +74,12 @@ describe("The http pull client should", () => {
                         callback(err)
                     }, 
                     (result) => {
+                        // TODO: Store data
                         callback(undefined, true)
                 })
             },
             (callback) => {
-                // Check if the pipe has an entry.
+                // TODO: Check if the pipe has an entry.
             }
         ], (err, result) => {
             if (err) {
