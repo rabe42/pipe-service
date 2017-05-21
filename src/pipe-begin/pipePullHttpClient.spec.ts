@@ -7,19 +7,20 @@ import {Pipe} from "../pipes/pipe"
 describe("The http pull client should", () => {
 
     let testResponse = {_id: 123456789, name: "testResponse", payload: {name: "payload", value: "A value"}}
+    let service : http.Server
 
     // Start a services which provides a simple message answer.
     // FIXME: Müsste dieser Service nicht auf 6513 lauschen?
-    // FIXME: Müsste dieser Service nicht auch beendet werden?
     function createService(cb: ()=>void) {
-        let service = http.createServer((request, response) => {
+        service = http.createServer((request, response) => {
             response.end(JSON.stringify(testResponse))
         })
+
         service.listen(9191, "localhost", cb)
     }
 
     function stopService(cb: ()=>void) {
-
+        service.close(cb)
     }
 
     it("not be created without a pipe.", () => {
@@ -50,6 +51,7 @@ describe("The http pull client should", () => {
                     pullClient.stop()
                     callback(null, true)
                 }, (payload) => {
+                    pullClient.stop()
                     callback(new Error("Claims everything Ok!"), false)
                 })
             }
@@ -57,7 +59,7 @@ describe("The http pull client should", () => {
             if (err) {
                 fail(err)
             }
-            done()
+            stopService(done)
         })
     })
 
@@ -85,7 +87,7 @@ describe("The http pull client should", () => {
             if (err) {
                 fail(err)
             }
-            done()
+            stopService(done)
         })
     })
 
